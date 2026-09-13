@@ -1,0 +1,134 @@
+{
+  "screens": [
+    {
+      "id": "monitorStatus",
+      "route": "/monitoring",
+      "view": "src/views/MonitorStatusView.vue",
+      "purpose": "주기 검사 결과 정상/실패.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "list",
+          "method": "GET",
+          "path": "/api/v1/monitor/checks",
+          "query": { "result": "pass | fail | no_data | empty" },
+          "response": {
+            "items": [
+              {
+                "id": "string",
+                "modelId": "string",
+                "target": "string",
+                "lastCheckAt": "string | null",
+                "result": "pass | fail | no_data",
+                "failedRule": "string"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "thresholds",
+      "route": "/monitoring/thresholds",
+      "view": "src/views/ThresholdsView.vue",
+      "purpose": "모니터 규칙 CRUD.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "list",
+          "method": "GET",
+          "path": "/api/v1/monitor/rules",
+          "response": { "items": ["MonitorRule"] }
+        },
+        {
+          "id": "options",
+          "method": "GET",
+          "path": "/api/v1/monitor/rule-options",
+          "why": "프로젝트·모델 셀렉트, 템플릿",
+          "response": {
+            "projects": ["ProjectListItem"],
+            "models": ["ModelListItem"],
+            "templates": [{ "id": "string", "name": "string" }]
+          }
+        },
+        {
+          "id": "save",
+          "method": "PUT",
+          "path": "/api/v1/monitor/rules/:id?",
+          "body": {
+            "projectId": "string",
+            "modelId": "string",
+            "metricName": "string",
+            "operator": "string",
+            "threshold": "number",
+            "interval": "string",
+            "channels": ["string"]
+          },
+          "roles": ["owner", "coordinator", "dsp_admin"]
+        },
+        {
+          "id": "disable",
+          "method": "POST",
+          "path": "/api/v1/monitor/rules/:id/disable",
+          "roles": ["owner", "coordinator", "dsp_admin"]
+        },
+        {
+          "id": "applyTemplate",
+          "method": "POST",
+          "path": "/api/v1/monitor/rules/:id/apply-template",
+          "body": { "templateId": "string" },
+          "roles": ["dsp_admin"]
+        }
+      ],
+      "types": {
+        "MonitorRule": {
+          "id": "string",
+          "projectId": "string",
+          "modelId": "string",
+          "metricName": "string",
+          "operator": "string",
+          "threshold": "number",
+          "interval": "string",
+          "channels": ["string"],
+          "enabled": "boolean"
+        }
+      }
+    },
+    {
+      "id": "drift",
+      "route": "/monitoring/drift",
+      "view": "src/views/DriftView.vue",
+      "purpose": "드리프트 추이와 Champion 자격 경고.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "models",
+          "method": "GET",
+          "path": "/api/v1/models",
+          "query": { "fields": "id,name,version,championHealth" },
+          "response": { "items": ["ModelListItem"] }
+        },
+        {
+          "id": "series",
+          "method": "GET",
+          "path": "/api/v1/models/:id/drift",
+          "query": { "from": "string", "to": "string" },
+          "response": {
+            "model": "Model",
+            "series": {
+              "labels": ["string"],
+              "inputDrift": ["number"],
+              "predictionDrift": ["number"],
+              "labelDrift": ["number"]
+            },
+            "events": [{ "at": "string", "kind": "champion_at_risk | disqualified_pending" }],
+            "snapshots": ["object"]
+          }
+        }
+      ]
+    }
+  ]
+}

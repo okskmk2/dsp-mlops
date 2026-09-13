@@ -1,0 +1,30 @@
+{
+  "screens": [
+    {
+      "id": "search",
+      "route": "/search",
+      "view": "src/views/SearchView.vue",
+      "purpose": "권한 범위 안 통합검색. GNB 검색이 이 화면으로 보낸다.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "search",
+          "method": "GET",
+          "path": "/api/v1/search",
+          "why": "탭별 결과 건수와 목록",
+          "query": { "q": "string" },
+          "response": {
+            "project": ["ProjectListItem"],
+            "model": ["ModelListItem"],
+            "dataset": [{ "id": "string", "name": "string", "ref": "string", "projectId": "string" }],
+            "approval": ["ApprovalListItem"],
+            "guide": ["SupportPostListItem"],
+            "notice": ["SupportPostListItem"],
+            "analysisRequest": ["AnalysisRequestListItem"]
+          }
+        }
+      ]
+    }
+  ]
+}

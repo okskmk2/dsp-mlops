@@ -1,0 +1,39 @@
+{
+  "screens": [
+    {
+      "id": "home",
+      "route": "/home",
+      "view": "src/views/HomeView.vue",
+      "purpose": "이상 모델, 결재, 예산, 드리프트를 한눈에 본다.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "getHome",
+          "method": "GET",
+          "path": "/api/v1/home",
+          "why": "KPI, 주의 모델, 내 결재 최대 3건, 진행 중 프로비저닝, 고정 공지",
+          "response": {
+            "kpis": {
+              "championCount": "number",
+              "monitorFailCount": "number",
+              "driftCount": "number",
+              "overBudgetProjectCount": "number"
+            },
+            "attentionModels": ["ModelListItem"],
+            "pendingApprovals": ["ApprovalListItem"],
+            "provisioning": [
+              {
+                "projectId": "string",
+                "projectName": "string",
+                "projectStatus": "string",
+                "rollup": "in_progress | failed"
+              }
+            ],
+            "notices": ["SupportPostListItem"]
+          }
+        }
+      ]
+    }
+  ]
+}

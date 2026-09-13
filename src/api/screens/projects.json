@@ -1,0 +1,285 @@
+{
+  "screens": [
+    {
+      "id": "projectList",
+      "route": "/projects",
+      "view": "src/views/ProjectListView.vue",
+      "purpose": "권한 범위 안 프로젝트 목록.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "list",
+          "method": "GET",
+          "path": "/api/v1/projects",
+          "why": "필터된 목록. general은 소속만, officer·admin은 전체+내 것만 토글",
+          "query": {
+            "status": "draft | pending_approval | active | closed | empty",
+            "platform": "azure_ml | azure_databricks | empty",
+            "scope": "all | mine"
+          },
+          "response": { "items": ["ProjectListItem"] }
+        }
+      ]
+    },
+    {
+      "id": "projectCreate",
+      "route": "/projects/new",
+      "view": "src/views/ProjectCreateView.vue",
+      "purpose": "프로젝트 정의 후 임시저장 또는 결재 상신.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "userPicker",
+          "method": "GET",
+          "path": "/api/v1/users",
+          "why": "초기 멤버 선택",
+          "query": { "enabled": "true" },
+          "response": { "items": ["User"] }
+        },
+        {
+          "id": "getDraft",
+          "method": "GET",
+          "path": "/api/v1/projects/:id",
+          "why": "임시저장 이어쓰기. query draft=:id",
+          "notes": "status=draft 이고 오너만."
+        },
+        {
+          "id": "saveDraft",
+          "method": "POST",
+          "path": "/api/v1/projects",
+          "why": "신규 임시저장",
+          "body": "ProjectCreateForm",
+          "response": { "id": "string" }
+        },
+        {
+          "id": "updateDraft",
+          "method": "PATCH",
+          "path": "/api/v1/projects/:id",
+          "why": "임시저장 수정",
+          "body": "ProjectCreateForm"
+        },
+        {
+          "id": "submitCreate",
+          "method": "POST",
+          "path": "/api/v1/projects/:id/submit",
+          "why": "project_create 결재 상신. status=pending_approval",
+          "response": { "id": "string", "approvalId": "string" }
+        },
+        {
+          "id": "discardDraft",
+          "method": "DELETE",
+          "path": "/api/v1/projects/:id",
+          "why": "임시저장 삭제. draft+오너만"
+        }
+      ],
+      "types": {
+        "ProjectCreateForm": {
+          "name": "string",
+          "goal": "string",
+          "background": "string",
+          "techStack": ["string"],
+          "budgetAmount": "number",
+          "startAt": "string",
+          "endAt": "string",
+          "members": [{ "userId": "string", "projectRole": "coordinator | member | viewer" }],
+          "useAzureMl": "boolean",
+          "useAzureDatabricks": "boolean",
+          "azureMlSpec": "object | null",
+          "databricksSpec": "object | null",
+          "sourceRequestId": "string | null"
+        }
+      }
+    },
+    {
+      "id": "projectOverview",
+      "route": "/projects/:id",
+      "view": "src/views/ProjectOverviewView.vue",
+      "purpose": "운영 헤더. 프로비저닝은 부가 타임라인.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "get",
+          "method": "GET",
+          "path": "/api/v1/projects/:id",
+          "why": "메타, 상태, 팀/모델 수, 예산 사용",
+          "response": {
+            "project": "Project",
+            "ownerName": "string",
+            "teamCount": "number",
+            "modelCount": "number",
+            "budgetUsedPct": "number",
+            "spent": "number",
+            "provisionRollup": "string",
+            "pendingClose": "boolean",
+            "pendingComputeUpgrade": "boolean"
+          }
+        },
+        {
+          "id": "timeline",
+          "method": "GET",
+          "path": "/api/v1/projects/:id/timeline",
+          "why": "결재 이력 + 프로비저닝 건",
+          "response": {
+            "approvals": ["ApprovalListItem"],
+            "provisions": ["Provision"]
+          }
+        },
+        {
+          "id": "submitBudgetChange",
+          "method": "POST",
+          "path": "/api/v1/projects/:id/budget-change",
+          "why": "오너 예산변경 상신",
+          "body": { "amount": "number" },
+          "roles": ["owner"]
+        },
+        {
+          "id": "submitClose",
+          "method": "POST",
+          "path": "/api/v1/projects/:id/close",
+          "why": "오너 종료 상신. 프로젝트 칩은 active 유지",
+          "roles": ["owner"]
+        }
+      ]
+    },
+    {
+      "id": "projectTeam",
+      "route": "/projects/:id/team",
+      "view": "src/views/ProjectTeamView.vue",
+      "purpose": "프로젝트 역할 배정.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "members",
+          "method": "GET",
+          "path": "/api/v1/projects/:id/members",
+          "response": { "items": ["Member"] }
+        },
+        {
+          "id": "userPicker",
+          "method": "GET",
+          "path": "/api/v1/users",
+          "query": { "enabled": "true" },
+          "response": { "items": ["User"] }
+        },
+        {
+          "id": "addMember",
+          "method": "POST",
+          "path": "/api/v1/projects/:id/members",
+          "body": { "userId": "string", "projectRole": "coordinator | member | viewer" },
+          "roles": ["owner", "coordinator"]
+        },
+        {
+          "id": "changeRole",
+          "method": "PATCH",
+          "path": "/api/v1/projects/:id/members/:userId",
+          "body": { "projectRole": "string" },
+          "roles": ["owner", "coordinator"]
+        },
+        {
+          "id": "removeMember",
+          "method": "DELETE",
+          "path": "/api/v1/projects/:id/members/:userId",
+          "roles": ["owner", "coordinator"]
+        }
+      ]
+    },
+    {
+      "id": "projectResources",
+      "route": "/projects/:id/resources",
+      "view": "src/views/ProjectResourcesView.vue",
+      "purpose": "AML/ADB 자산 조회, 딥링크, 컴퓨팅 상향 진입.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "list",
+          "method": "GET",
+          "path": "/api/v1/projects/:id/provisions",
+          "response": {
+            "items": ["Provision"],
+            "pendingUpgrades": ["ApprovalListItem"]
+          }
+        },
+        {
+          "id": "retry",
+          "method": "POST",
+          "path": "/api/v1/provisions/:provisionId/retry",
+          "why": "실패 건 재큐. 프로젝트 상태 불변",
+          "roles": ["dsp_admin"]
+        }
+      ]
+    },
+    {
+      "id": "computeUpgrade",
+      "route": "/projects/:id/resources/:provisionId/upgrade",
+      "view": "src/views/ComputeUpgradeView.vue",
+      "purpose": "워크스페이스 컴퓨팅 등급 상향 상신. 클러스터 설계 없음.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "catalog",
+          "method": "GET",
+          "path": "/api/v1/projects/:id/provisions/:provisionId/upgrade-options",
+          "why": "현재 등급, 상위 카탈로그, 월 증분, 잔여 예산",
+          "response": {
+            "workspace": "Provision",
+            "fromClass": "string",
+            "classes": [{ "id": "string", "label": "string", "monthlyCost": "number", "tier": "number" }],
+            "remainingBudget": "number"
+          }
+        },
+        {
+          "id": "submit",
+          "method": "POST",
+          "path": "/api/v1/projects/:id/provisions/:provisionId/upgrade",
+          "body": { "toClass": "string", "reason": "string" },
+          "roles": ["owner", "coordinator", "member"]
+        }
+      ]
+    },
+    {
+      "id": "projectCost",
+      "route": "/projects/:id/cost",
+      "view": "src/views/ProjectCostView.vue",
+      "purpose": "프로젝트 예산 대비 실적.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "get",
+          "method": "GET",
+          "path": "/api/v1/projects/:id/cost",
+          "query": { "from": "string", "to": "string" },
+          "response": {
+            "budget": "number",
+            "actual": "number",
+            "byPlatform": [{ "platform": "string", "amount": "number" }],
+            "series": { "labels": ["string"], "series": ["object"] },
+            "records": [{ "id": "string", "platform": "string", "amount": "number", "at": "string" }]
+          }
+        }
+      ]
+    },
+    {
+      "id": "projectModels",
+      "route": "/projects/:id/models",
+      "view": "src/views/ProjectModelsView.vue",
+      "purpose": "이 프로젝트 모델 자산.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "list",
+          "method": "GET",
+          "path": "/api/v1/projects/:id/models",
+          "response": { "items": ["ModelListItem"] }
+        }
+      ]
+    }
+  ]
+}

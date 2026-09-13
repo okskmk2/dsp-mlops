@@ -1,0 +1,56 @@
+{
+  "screens": [
+    {
+      "id": "orgCost",
+      "route": "/cost",
+      "view": "src/views/CostView.vue",
+      "purpose": "프로젝트·플랫폼 비용. 직책자·관리자 전사, 일반은 소속 합.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "summary",
+          "method": "GET",
+          "path": "/api/v1/cost",
+          "query": {
+            "groupBy": "project | team | platform",
+            "from": "string",
+            "to": "string"
+          },
+          "response": {
+            "rank": [{ "id": "string", "label": "string", "amount": "number", "budget": "number" }],
+            "platformShare": [{ "label": "string", "value": "number" }],
+            "idleHint": { "label": "string", "nullable": true },
+            "rows": ["object"]
+          }
+        },
+        {
+          "id": "exportCsv",
+          "method": "GET",
+          "path": "/api/v1/cost.csv",
+          "query": { "groupBy": "string", "from": "string", "to": "string" },
+          "why": "CSV 다운로드"
+        }
+      ]
+    },
+    {
+      "id": "costResources",
+      "route": "/cost/resources",
+      "view": "src/views/CostResourcesView.vue",
+      "purpose": "리소스 종류별 비용.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "byResource",
+          "method": "GET",
+          "path": "/api/v1/cost/resources",
+          "query": { "from": "string", "to": "string" },
+          "response": {
+            "items": [{ "kind": "string", "platform": "string", "amount": "number" }]
+          }
+        }
+      ]
+    }
+  ]
+}

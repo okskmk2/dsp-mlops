@@ -1,0 +1,127 @@
+{
+  "screens": [
+    {
+      "id": "modelRegistry",
+      "route": "/models",
+      "view": "src/views/ModelRegistryView.vue",
+      "purpose": "Draft/Challenger/Champion 보드.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "list",
+          "method": "GET",
+          "path": "/api/v1/models",
+          "query": { "stage": "draft | challenger | champion | empty" },
+          "response": { "items": ["ModelListItem"] }
+        }
+      ]
+    },
+    {
+      "id": "modelPromotions",
+      "route": "/models/promotions",
+      "view": "src/views/ModelPromotionsView.vue",
+      "purpose": "Champion 승격·강등 품의 목록.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "list",
+          "method": "GET",
+          "path": "/api/v1/approvals",
+          "query": { "type": "champion_promote,champion_demote" },
+          "response": { "items": ["ApprovalListItem"] }
+        }
+      ]
+    },
+    {
+      "id": "modelDetail",
+      "route": "/models/:id",
+      "view": "src/views/ModelDetailView.vue",
+      "purpose": "운영 판단. 학습 UI 없음.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "get",
+          "method": "GET",
+          "path": "/api/v1/models/:id",
+          "response": {
+            "model": "Model",
+            "project": "ProjectListItem",
+            "latestCheck": "object | null",
+            "driftSpark": [{ "at": "string", "value": "number" }],
+            "lineageMini": [{ "from": "string", "to": "string" }]
+          }
+        },
+        {
+          "id": "registerChallenger",
+          "method": "POST",
+          "path": "/api/v1/models/:id/challenger",
+          "why": "Draft → Challenger",
+          "roles": ["owner", "coordinator", "member"]
+        },
+        {
+          "id": "submitDemotion",
+          "method": "POST",
+          "path": "/api/v1/models/:id/demote",
+          "why": "Champion 강등 상신",
+          "roles": ["owner", "coordinator"]
+        }
+      ]
+    },
+    {
+      "id": "modelPromote",
+      "route": "/models/:id/promote",
+      "view": "src/views/ModelPromoteView.vue",
+      "purpose": "Challenger vs Champion 비교 후 승격 상신.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "compare",
+          "method": "GET",
+          "path": "/api/v1/models/:id/promotion-preview",
+          "response": {
+            "challenger": "Model",
+            "champion": "Model | null",
+            "metrics": [{ "metric": "string", "challenger": "number", "champion": "number | null" }],
+            "monitorPass": "boolean",
+            "driftBelow": "boolean",
+            "approverName": "string"
+          }
+        },
+        {
+          "id": "submit",
+          "method": "POST",
+          "path": "/api/v1/models/:id/promote",
+          "roles": ["owner", "coordinator"]
+        }
+      ]
+    },
+    {
+      "id": "retrainModal",
+      "route": "modal",
+      "view": "src/components/modals/RetrainModal.vue",
+      "purpose": "기존 Job 재실행 요청. 클러스터 설계 없음.",
+      "auth": true,
+      "usesCommon": [],
+      "endpoints": [
+        {
+          "id": "jobs",
+          "method": "GET",
+          "path": "/api/v1/models/:id/jobs",
+          "why": "existingJobId 선택",
+          "response": { "items": [{ "id": "string", "label": "string", "cloudRunUrl": "string | null" }] }
+        },
+        {
+          "id": "submit",
+          "method": "POST",
+          "path": "/api/v1/models/:id/retrain",
+          "body": { "reason": "string", "datasetRef": "string", "existingJobId": "string" },
+          "roles": ["owner", "coordinator", "member"]
+        }
+      ]
+    }
+  ]
+}

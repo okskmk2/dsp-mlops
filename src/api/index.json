@@ -1,0 +1,56 @@
+{
+  "basePath": "/api/v1",
+  "common": "common.json",
+  "screens": [
+    { "id": "login", "route": "/login", "file": "screens/login.json" },
+    { "id": "home", "route": "/home", "file": "screens/home.json" },
+    { "id": "search", "route": "/search", "file": "screens/search.json" },
+    { "id": "settings", "route": "/settings", "file": "screens/settings.json" },
+    { "id": "notifications", "route": "/notifications", "file": "screens/notifications.json" },
+
+    { "id": "projectList", "route": "/projects", "file": "screens/projects.json" },
+    { "id": "projectCreate", "route": "/projects/new", "file": "screens/projects.json" },
+    { "id": "projectOverview", "route": "/projects/:id", "file": "screens/projects.json" },
+    { "id": "projectTeam", "route": "/projects/:id/team", "file": "screens/projects.json" },
+    { "id": "projectResources", "route": "/projects/:id/resources", "file": "screens/projects.json" },
+    { "id": "computeUpgrade", "route": "/projects/:id/resources/:provisionId/upgrade", "file": "screens/projects.json" },
+    { "id": "projectCost", "route": "/projects/:id/cost", "file": "screens/projects.json" },
+    { "id": "projectModels", "route": "/projects/:id/models", "file": "screens/projects.json" },
+
+    { "id": "modelRegistry", "route": "/models", "file": "screens/models.json" },
+    { "id": "modelPromotions", "route": "/models/promotions", "file": "screens/models.json" },
+    { "id": "modelDetail", "route": "/models/:id", "file": "screens/models.json" },
+    { "id": "modelPromote", "route": "/models/:id/promote", "file": "screens/models.json" },
+    { "id": "retrainModal", "route": "modal", "file": "screens/models.json" },
+
+    { "id": "monitorStatus", "route": "/monitoring", "file": "screens/monitoring.json" },
+    { "id": "thresholds", "route": "/monitoring/thresholds", "file": "screens/monitoring.json" },
+    { "id": "drift", "route": "/monitoring/drift", "file": "screens/monitoring.json" },
+
+    { "id": "orgCost", "route": "/cost", "file": "screens/cost.json" },
+    { "id": "costResources", "route": "/cost/resources", "file": "screens/cost.json" },
+
+    { "id": "lineageExplore", "route": "/lineage", "file": "screens/lineage.json" },
+    { "id": "lineageNode", "route": "/lineage/nodes/:nodeId", "file": "screens/lineage.json" },
+    { "id": "contamination", "route": "/lineage/contamination", "file": "screens/lineage.json" },
+
+    { "id": "approvals", "route": "/approvals", "file": "screens/approvals.json" },
+    { "id": "approvalDetail", "route": "/approvals/:id", "file": "screens/approvals.json" },
+
+    { "id": "guideList", "route": "/support/guides", "file": "screens/support.json" },
+    { "id": "guideDetail", "route": "/support/guides/:id", "file": "screens/support.json" },
+    { "id": "guideEdit", "route": "/support/guides/new|/support/guides/:id/edit", "file": "screens/support.json" },
+    { "id": "noticeList", "route": "/support/notices", "file": "screens/support.json" },
+    { "id": "noticeDetail", "route": "/support/notices/:id", "file": "screens/support.json" },
+    { "id": "noticeEdit", "route": "/support/notices/new|/support/notices/:id/edit", "file": "screens/support.json" },
+
+    { "id": "analysisRequestList", "route": "/requests", "file": "screens/requests.json" },
+    { "id": "analysisRequestCreate", "route": "/requests/new", "file": "screens/requests.json" },
+    { "id": "analysisRequestDetail", "route": "/requests/:id", "file": "screens/requests.json" },
+
+    { "id": "adminUsers", "route": "/admin/users", "file": "screens/admin.json" },
+    { "id": "adminPermissions", "route": "/admin/permissions", "file": "screens/admin.json" },
+    { "id": "adminCodes", "route": "/admin/codes", "file": "screens/admin.json" },
+    { "id": "adminCodeGroup", "route": "/admin/codes/:group", "file": "screens/admin.json" }
+  ]
+}

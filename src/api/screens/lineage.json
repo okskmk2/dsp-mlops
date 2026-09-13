@@ -1,0 +1,111 @@
+{
+  "screens": [
+    {
+      "id": "lineageExplore",
+      "route": "/lineage",
+      "view": "src/views/LineageView.vue",
+      "purpose": "데이터셋-Job-모델-엔드포인트 계보. 노드 선택은 상세 페이지.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "graph",
+          "method": "GET",
+          "path": "/api/v1/lineage",
+          "query": { "q": "string" },
+          "response": {
+            "nodes": [
+              {
+                "id": "string",
+                "kind": "dataset | job | modelVersion | endpoint",
+                "label": "string",
+                "ref": "string | null",
+                "version": "string | null"
+              }
+            ],
+            "edges": [{ "from": "string", "to": "string" }]
+          }
+        }
+      ]
+    },
+    {
+      "id": "lineageNode",
+      "route": "/lineage/nodes/:nodeId",
+      "view": "src/views/LineageNodeView.vue",
+      "purpose": "노드 속성·하류 영향.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "get",
+          "method": "GET",
+          "path": "/api/v1/lineage/nodes/:nodeId",
+          "query": { "depth": "number" },
+          "response": {
+            "node": "object",
+            "upstream": ["object"],
+            "downstream": ["object"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "contamination",
+      "route": "/lineage/contamination",
+      "view": "src/views/ContaminationView.vue",
+      "purpose": "태그+시간 구간 오염과 영향 모델.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "list",
+          "method": "GET",
+          "path": "/api/v1/contaminations",
+          "response": { "items": ["Contamination"] }
+        },
+        {
+          "id": "options",
+          "method": "GET",
+          "path": "/api/v1/contaminations/options",
+          "why": "프로젝트·태그 셀렉트",
+          "response": {
+            "projects": ["ProjectListItem"],
+            "tags": ["Code"]
+          }
+        },
+        {
+          "id": "declare",
+          "method": "POST",
+          "path": "/api/v1/contaminations",
+          "body": {
+            "projectId": "string",
+            "tagId": "string",
+            "tsFrom": "string",
+            "tsTo": "string",
+            "reason": "string",
+            "impactedModelIds": ["string"]
+          },
+          "roles": ["owner", "coordinator", "member"]
+        },
+        {
+          "id": "close",
+          "method": "POST",
+          "path": "/api/v1/contaminations/:id/close",
+          "roles": ["owner", "coordinator", "member"]
+        }
+      ],
+      "types": {
+        "Contamination": {
+          "id": "string",
+          "projectId": "string",
+          "tagId": "string",
+          "tsFrom": "string",
+          "tsTo": "string",
+          "reason": "string",
+          "status": "open | closed",
+          "impactedModelIds": ["string"]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "screens": [
+    {
+      "id": "approvals",
+      "route": "/approvals",
+      "view": "src/views/ApprovalsView.vue",
+      "purpose": "전자결재 목록. 승인권자 처리, 요청자는 본인 건 조회.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "list",
+          "method": "GET",
+          "path": "/api/v1/approvals",
+          "query": { "status": "pending | approved | rejected | empty" },
+          "response": { "items": ["ApprovalListItem"] }
+        }
+      ]
+    },
+    {
+      "id": "approvalDetail",
+      "route": "/approvals/:id",
+      "view": "src/views/ApprovalDetailView.vue",
+      "purpose": "품의 상세·승인·반려.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "get",
+          "method": "GET",
+          "path": "/api/v1/approvals/:id",
+          "response": {
+            "approval": "Approval",
+            "target": {
+              "name": "string",
+              "href": "string | null",
+              "projectId": "string | null"
+            },
+            "canDecide": "boolean"
+          }
+        },
+        {
+          "id": "decide",
+          "method": "POST",
+          "path": "/api/v1/approvals/:id/decide",
+          "body": { "decision": "approved | rejected", "comment": "string" },
+          "roles": ["approver"],
+          "notes": "반려 시 comment 필수. 승인 시 유형별 후속(프로비저닝 큐, 승격, 예산, 종료, 컴퓨팅 상향)은 서버."
+        }
+      ]
+    }
+  ]
+}

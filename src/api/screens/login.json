@@ -1,0 +1,30 @@
+{
+  "screens": [
+    {
+      "id": "login",
+      "route": "/login",
+      "view": "src/views/LoginView.vue",
+      "purpose": "역할별 계정으로 들어가 권한 범위를 확인한다. 운영에서는 SSO로 대체 가능.",
+      "auth": false,
+      "usesCommon": [],
+      "endpoints": [
+        {
+          "id": "directory",
+          "method": "GET",
+          "path": "/api/v1/session/directory",
+          "why": "로그인 화면에 활성 계정 목록",
+          "response": { "users": ["User"] }
+        },
+        {
+          "id": "login",
+          "method": "POST",
+          "path": "/api/v1/session",
+          "why": "세션 생성",
+          "body": { "userId": "string" },
+          "response": "Me",
+          "notes": "SSO 도입 시 이 엔드포인트와 directory는 IdP 콜백으로 대체."
+        }
+      ]
+    }
+  ]
+}

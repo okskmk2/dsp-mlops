@@ -1,0 +1,113 @@
+{
+  "screens": [
+    {
+      "id": "analysisRequestList",
+      "route": "/requests",
+      "view": "src/views/AnalysisRequestListView.vue",
+      "purpose": "ML 작업 의뢰 목록. 일반은 본인 건, 직책자·관리자는 전체.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "list",
+          "method": "GET",
+          "path": "/api/v1/analysis-requests",
+          "query": { "status": "string", "intent": "string" },
+          "response": { "items": ["AnalysisRequestListItem"] }
+        }
+      ]
+    },
+    {
+      "id": "analysisRequestCreate",
+      "route": "/requests/new",
+      "view": "src/views/AnalysisRequestFormView.vue",
+      "purpose": "의뢰 작성. 학습 UI가 아니다.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "projects",
+          "method": "GET",
+          "path": "/api/v1/projects",
+          "query": { "status": "active", "scope": "mine" },
+          "why": "관련 프로젝트 선택(선택 항목)"
+        },
+        {
+          "id": "saveDraft",
+          "method": "POST",
+          "path": "/api/v1/analysis-requests",
+          "body": "AnalysisRequestForm",
+          "response": { "id": "string" }
+        },
+        {
+          "id": "submit",
+          "method": "POST",
+          "path": "/api/v1/analysis-requests/:id/submit",
+          "why": "status=submitted, 관리자 전원 알림"
+        }
+      ],
+      "types": {
+        "AnalysisRequestForm": {
+          "title": "string",
+          "problem": "string",
+          "businessContext": "string",
+          "desiredOutcome": "string",
+          "dataDescription": "string",
+          "dueAt": "string | null",
+          "relatedProjectId": "string | null",
+          "fulfillmentIntent": "string"
+        }
+      }
+    },
+    {
+      "id": "analysisRequestDetail",
+      "route": "/requests/:id",
+      "view": "src/views/AnalysisRequestDetailView.vue",
+      "purpose": "의뢰 본문과 수용 경로.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "get",
+          "method": "GET",
+          "path": "/api/v1/analysis-requests/:id",
+          "response": { "request": "AnalysisRequest" }
+        },
+        {
+          "id": "activeProjects",
+          "method": "GET",
+          "path": "/api/v1/projects",
+          "query": { "status": "active", "scope": "all" },
+          "why": "관리자 기존 프로젝트 배정 셀렉트",
+          "roles": ["dsp_admin"]
+        },
+        {
+          "id": "startReview",
+          "method": "POST",
+          "path": "/api/v1/analysis-requests/:id/review",
+          "roles": ["dsp_admin"]
+        },
+        {
+          "id": "linkProject",
+          "method": "POST",
+          "path": "/api/v1/analysis-requests/:id/link-project",
+          "body": { "projectId": "string" },
+          "roles": ["dsp_admin"]
+        },
+        {
+          "id": "reject",
+          "method": "POST",
+          "path": "/api/v1/analysis-requests/:id/reject",
+          "body": { "reason": "string" },
+          "roles": ["dsp_admin"]
+        },
+        {
+          "id": "complete",
+          "method": "POST",
+          "path": "/api/v1/analysis-requests/:id/complete",
+          "roles": ["dsp_admin"]
+        }
+      ]
+    }
+  ]
+}

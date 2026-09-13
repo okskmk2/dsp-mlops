@@ -1,0 +1,254 @@
+{
+  "basePath": "/api/v1",
+  "auth": {
+    "header": "Authorization: Bearer <token>",
+    "sessionCookie": "dsp_session",
+    "unauthenticated": ["POST /session", "GET /session/directory", "DELETE /session"]
+  },
+  "envelope": {
+    "ok": { "ok": true, "data": "T" },
+    "fail": { "ok": false, "error": { "code": "string", "message": "string" } }
+  },
+  "errorCodes": ["unauthorized", "forbidden", "not_found", "validation", "conflict"],
+  "types": {
+    "User": {
+      "id": "string",
+      "name": "string",
+      "email": "string",
+      "platformRole": "dsp_admin | officer | general",
+      "title": "string",
+      "isApprover": "boolean",
+      "initials": "string",
+      "enabled": "boolean"
+    },
+    "Me": {
+      "user": "User",
+      "themePref": "system | light | dark",
+      "settings": { "notifyInapp": "boolean", "notifyEmail": "boolean" }
+    },
+    "ProjectListItem": {
+      "id": "string",
+      "name": "string",
+      "ownerUserId": "string",
+      "ownerName": "string",
+      "platforms": ["azure_ml | azure_databricks"],
+      "status": "draft | pending_approval | active | closed",
+      "endAt": "string",
+      "budgetUsedPct": "number",
+      "championCount": "number",
+      "provisionRollup": "none | in_progress | failed | succeeded"
+    },
+    "Project": {
+      "id": "string",
+      "name": "string",
+      "goal": "string",
+      "background": "string",
+      "techStack": ["string"],
+      "ownerUserId": "string",
+      "budgetAmount": "number",
+      "budgetCurrency": "KRW",
+      "startAt": "string",
+      "endAt": "string",
+      "platforms": ["azure_ml | azure_databricks"],
+      "azureMlSpec": "object | null",
+      "databricksSpec": "object | null",
+      "status": "draft | pending_approval | active | closed",
+      "approvalId": "string | null",
+      "sourceRequestId": "string | null",
+      "createdBy": "string",
+      "createdAt": "string"
+    },
+    "Member": {
+      "projectId": "string",
+      "userId": "string",
+      "userName": "string",
+      "projectRole": "owner | coordinator | member | viewer",
+      "platformRole": "string",
+      "addedBy": "string",
+      "addedAt": "string"
+    },
+    "Provision": {
+      "id": "string",
+      "projectId": "string",
+      "platform": "azure_ml | azure_databricks",
+      "kind": "workspace | compute_upgrade",
+      "resourceSpec": "object",
+      "fromSpec": "object | null",
+      "toSpec": "object | null",
+      "approvalId": "string | null",
+      "estimatedMonthlyDelta": "number | null",
+      "status": "queued | running | succeeded | failed",
+      "cloudResourceId": "string | null",
+      "cloudConsoleUrl": "string | null",
+      "errorMessage": "string | null",
+      "computeClass": "string | null",
+      "createdAt": "string"
+    },
+    "ModelListItem": {
+      "id": "string",
+      "projectId": "string",
+      "projectName": "string",
+      "name": "string",
+      "version": "string",
+      "stage": "draft | challenger | champion",
+      "championHealth": "healthy | at_risk | null",
+      "lastMonitor": "pass | fail | no_data",
+      "driftScore": "number | null",
+      "costMonth": "number | null"
+    },
+    "Model": {
+      "id": "string",
+      "projectId": "string",
+      "name": "string",
+      "version": "string",
+      "stage": "draft | challenger | champion",
+      "framework": "string",
+      "metricsSnapshot": "object",
+      "championHealth": "healthy | at_risk | null",
+      "lastMonitor": "pass | fail | no_data",
+      "driftScore": "number | null",
+      "endpointId": "string | null",
+      "runDeepLink": "string | null"
+    },
+    "ApprovalListItem": {
+      "id": "string",
+      "type": "project_create | project_close | budget_change | champion_promote | champion_demote | compute_upgrade",
+      "payloadRef": "string",
+      "targetName": "string",
+      "requesterId": "string",
+      "requesterName": "string",
+      "approverId": "string",
+      "amount": "number | null",
+      "status": "pending | approved | rejected",
+      "createdAt": "string"
+    },
+    "Approval": {
+      "id": "string",
+      "type": "string",
+      "payloadRef": "string",
+      "requesterId": "string",
+      "approverId": "string",
+      "amount": "number | null",
+      "fromClass": "string | null",
+      "toClass": "string | null",
+      "estimatedMonthlyDelta": "number | null",
+      "remainingBudget": "number | null",
+      "reason": "string | null",
+      "status": "pending | approved | rejected",
+      "comment": "string | null",
+      "createdAt": "string",
+      "decidedAt": "string | null"
+    },
+    "Notification": {
+      "id": "string",
+      "type": "string",
+      "title": "string",
+      "body": "string",
+      "href": "string | null",
+      "read": "boolean",
+      "createdAt": "string"
+    },
+    "SupportPostListItem": {
+      "id": "string",
+      "board": "guide | notice",
+      "title": "string",
+      "category": "string | null",
+      "severity": "info | important | null",
+      "status": "draft | published",
+      "pinned": "boolean",
+      "authorId": "string",
+      "authorName": "string",
+      "publishedAt": "string | null",
+      "updatedAt": "string"
+    },
+    "SupportPost": {
+      "id": "string",
+      "board": "guide | notice",
+      "title": "string",
+      "body": "string",
+      "category": "string | null",
+      "severity": "info | important | null",
+      "status": "draft | published",
+      "pinned": "boolean",
+      "expiresAt": "string | null",
+      "authorId": "string",
+      "publishedAt": "string | null",
+      "updatedAt": "string"
+    },
+    "AnalysisRequestListItem": {
+      "id": "string",
+      "title": "string",
+      "requesterId": "string",
+      "requesterName": "string",
+      "fulfillmentIntent": "string",
+      "relatedProjectId": "string | null",
+      "status": "draft | submitted | reviewing | linked_existing | new_project | rejected | completed",
+      "createdAt": "string"
+    },
+    "AnalysisRequest": {
+      "id": "string",
+      "title": "string",
+      "problem": "string",
+      "businessContext": "string",
+      "desiredOutcome": "string",
+      "dataDescription": "string",
+      "dueAt": "string | null",
+      "relatedProjectId": "string | null",
+      "fulfillmentIntent": "string",
+      "status": "string",
+      "requesterId": "string",
+      "assigneeId": "string | null",
+      "linkedProjectId": "string | null",
+      "rejectReason": "string | null",
+      "createdAt": "string",
+      "updatedAt": "string"
+    },
+    "Code": {
+      "id": "string",
+      "group": "string",
+      "code": "string",
+      "label": "string",
+      "sort": "number",
+      "enabled": "boolean"
+    }
+  },
+  "shell": {
+    "note": "인증된 모든 화면. GNB·아바타 메뉴.",
+    "endpoints": [
+      {
+        "id": "session.me",
+        "method": "GET",
+        "path": "/api/v1/session",
+        "why": "현재 사용자·테마·알림 설정",
+        "response": "Me"
+      },
+      {
+        "id": "shell.badges",
+        "method": "GET",
+        "path": "/api/v1/shell/badges",
+        "why": "GNB 결재함·알림 숫자",
+        "response": {
+          "pendingApprovals": "number",
+          "unreadNotifications": "number"
+        }
+      },
+      {
+        "id": "shell.monitorSummary",
+        "method": "GET",
+        "path": "/api/v1/shell/monitor-summary",
+        "why": "GNB 모니터링 팝오버",
+        "response": {
+          "failCount": "number",
+          "driftCount": "number",
+          "recent": ["ModelListItem"]
+        }
+      },
+      {
+        "id": "session.logout",
+        "method": "DELETE",
+        "path": "/api/v1/session",
+        "why": "로그아웃"
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "screens": [
+    {
+      "id": "settings",
+      "route": "/settings",
+      "view": "src/views/SettingsView.vue",
+      "purpose": "본인 프로필·테마·알림. 아바타 메뉴와 동일 화면.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "patchSettings",
+          "method": "PATCH",
+          "path": "/api/v1/me/settings",
+          "why": "앱/이메일 알림 저장",
+          "body": { "notifyInapp": "boolean", "notifyEmail": "boolean" },
+          "response": { "settings": { "notifyInapp": "boolean", "notifyEmail": "boolean" } }
+        },
+        {
+          "id": "patchTheme",
+          "method": "PATCH",
+          "path": "/api/v1/me/theme",
+          "why": "테마 즉시 반영",
+          "body": { "themePref": "system | light | dark" },
+          "response": { "themePref": "string" }
+        },
+        {
+          "id": "switchAccount",
+          "method": "POST",
+          "path": "/api/v1/session",
+          "why": "데모 역할 체험. 운영 SSO에서는 제거.",
+          "body": { "userId": "string" },
+          "response": "Me"
+        }
+      ]
+    }
+  ]
+}

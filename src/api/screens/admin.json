@@ -1,0 +1,133 @@
+{
+  "screens": [
+    {
+      "id": "adminUsers",
+      "route": "/admin/users",
+      "view": "src/views/admin/AdminUsersView.vue",
+      "purpose": "플랫폼 사용자 등록·수정·비활성.",
+      "auth": true,
+      "roles": ["dsp_admin"],
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "list",
+          "method": "GET",
+          "path": "/api/v1/admin/users",
+          "response": { "items": ["User"] }
+        },
+        {
+          "id": "save",
+          "method": "PUT",
+          "path": "/api/v1/admin/users/:id?",
+          "body": {
+            "name": "string",
+            "email": "string",
+            "title": "string",
+            "platformRole": "dsp_admin | officer | general",
+            "isApprover": "boolean"
+          }
+        },
+        {
+          "id": "setEnabled",
+          "method": "POST",
+          "path": "/api/v1/admin/users/:id/enabled",
+          "body": { "enabled": "boolean" }
+        }
+      ]
+    },
+    {
+      "id": "adminPermissions",
+      "route": "/admin/permissions",
+      "view": "src/views/admin/AdminPermissionsView.vue",
+      "purpose": "플랫폼 역할·승인권자·결재선·권한 매트릭스.",
+      "auth": true,
+      "roles": ["dsp_admin"],
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "matrix",
+          "method": "GET",
+          "path": "/api/v1/admin/permissions",
+          "response": {
+            "users": ["User"],
+            "approvalLines": [
+              { "type": "string", "approverId": "string" }
+            ]
+          }
+        },
+        {
+          "id": "setPlatformRole",
+          "method": "PATCH",
+          "path": "/api/v1/admin/users/:id/platform-role",
+          "body": { "platformRole": "string" }
+        },
+        {
+          "id": "setApprover",
+          "method": "PATCH",
+          "path": "/api/v1/admin/users/:id/approver",
+          "body": { "isApprover": "boolean" }
+        },
+        {
+          "id": "saveLine",
+          "method": "PUT",
+          "path": "/api/v1/admin/approval-lines/:type",
+          "body": { "approverId": "string" }
+        }
+      ]
+    },
+    {
+      "id": "adminCodes",
+      "route": "/admin/codes",
+      "view": "src/views/admin/AdminCodeGroupsView.vue",
+      "purpose": "공통 코드 그룹 목록.",
+      "auth": true,
+      "roles": ["dsp_admin"],
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "groups",
+          "method": "GET",
+          "path": "/api/v1/admin/code-groups",
+          "response": {
+            "items": [{ "group": "string", "label": "string", "count": "number" }]
+          }
+        }
+      ]
+    },
+    {
+      "id": "adminCodeGroup",
+      "route": "/admin/codes/:group",
+      "view": "src/views/admin/AdminCodesView.vue",
+      "purpose": "한 코드 그룹의 코드 테이블.",
+      "auth": true,
+      "roles": ["dsp_admin"],
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "list",
+          "method": "GET",
+          "path": "/api/v1/admin/codes",
+          "query": { "group": "string" },
+          "response": { "items": ["Code"] }
+        },
+        {
+          "id": "save",
+          "method": "PUT",
+          "path": "/api/v1/admin/codes/:id?",
+          "body": {
+            "group": "string",
+            "code": "string",
+            "label": "string",
+            "sort": "number"
+          }
+        },
+        {
+          "id": "setEnabled",
+          "method": "POST",
+          "path": "/api/v1/admin/codes/:id/enabled",
+          "body": { "enabled": "boolean" }
+        }
+      ]
+    }
+  ]
+}
