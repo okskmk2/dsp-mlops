@@ -115,70 +115,38 @@
       ]
     },
     "snb": {
+      "quickAction": {
+        "label": "신규 요청",
+        "items": [
+          { "id": "projectCreate", "label": "프로젝트 생성 신청", "route": "/projects/new" },
+          { "id": "requestCreate", "label": "분석 요청하기", "route": "/requests/new" }
+        ]
+      },
       "items": [
         { "id": "home", "label": "홈", "route": "/home" },
         {
-          "id": "projects",
-          "label": "프로젝트",
-          "route": "/projects",
+          "id": "assets",
+          "label": "ML 자산",
           "children": [
-            { "id": "projectList", "label": "목록", "route": "/projects" },
-            { "id": "projectCreate", "label": "생성 신청", "route": "/projects/new" }
+            { "id": "projectList", "label": "프로젝트 목록", "route": "/projects" },
+            { "id": "registry", "label": "모델 레지스트리", "route": "/models" }
           ]
         },
         {
-          "id": "models",
-          "label": "모델",
-          "route": "/models",
+          "id": "ops",
+          "label": "관제 & 거버넌스",
           "children": [
-            { "id": "registry", "label": "레지스트리", "route": "/models" },
-            { "id": "promotionInbox", "label": "승격 요청", "route": "/models/promotions" }
-          ]
-        },
-        {
-          "id": "monitoring",
-          "label": "모니터링",
-          "route": "/monitoring",
-          "children": [
-            { "id": "monitorStatus", "label": "현황", "route": "/monitoring" },
-            { "id": "thresholds", "label": "기준치", "route": "/monitoring/thresholds" },
-            { "id": "drift", "label": "드리프트", "route": "/monitoring/drift" }
-          ]
-        },
-        {
-          "id": "cost",
-          "label": "비용·활용",
-          "route": "/cost",
-          "children": [
-            { "id": "costByProject", "label": "프로젝트별", "route": "/cost" },
-            { "id": "costByResource", "label": "리소스별", "route": "/cost/resources" }
-          ]
-        },
-        {
-          "id": "lineage",
-          "label": "리니지",
-          "route": "/lineage",
-          "children": [
-            { "id": "lineageExplore", "label": "탐색", "route": "/lineage" },
-            { "id": "contamination", "label": "오염 구간", "route": "/lineage/contamination" }
+            { "id": "monitorStatus", "label": "모니터링 & 드리프트", "route": "/monitoring" },
+            { "id": "lineageExplore", "label": "리니지 & 오염 분석", "route": "/lineage" },
+            { "id": "costByProject", "label": "비용 & 리소스", "route": "/cost" }
           ]
         },
         {
           "id": "support",
-          "label": "지원·지식",
-          "route": "/support/guides",
+          "label": "지원 & 요청",
           "children": [
-            { "id": "guides", "label": "사용법", "route": "/support/guides" },
-            { "id": "notices", "label": "공지사항", "route": "/support/notices" }
-          ]
-        },
-        {
-          "id": "analysisRequests",
-          "label": "분석요청",
-          "route": "/requests",
-          "children": [
-            { "id": "requestList", "label": "목록", "route": "/requests" },
-            { "id": "requestCreate", "label": "요청하기", "route": "/requests/new" }
+            { "id": "requestList", "label": "분석 요청", "route": "/requests" },
+            { "id": "guides", "label": "가이드 & 공지사항", "route": "/support/guides" }
           ]
         },
         {

@@ -1,94 +1,71 @@
 <script setup>
 import {
   Activity,
-  Boxes,
-  CircleDollarSign,
   CircleHelp,
-  ClipboardList,
   FolderKanban,
-  GitBranch,
   House,
+  Plus,
   Shield,
 } from '@lucide/vue'
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import DsIcon from '../ui/DsIcon.vue'
 import { canManageDspSettings } from '../../lib/permissions'
 import { useAuthStore } from '../../stores/auth'
 
 const route = useRoute()
+const router = useRouter()
 const auth = useAuthStore()
 const isAdmin = computed(() => canManageDspSettings(auth.user))
+
+const showQuickMenu = ref(false)
+
+function toggleQuickMenu() {
+  showQuickMenu.value = !showQuickMenu.value
+}
+
+function handleQuickAction(path) {
+  showQuickMenu.value = false
+  router.push(path)
+}
+
+function onDocClick(event) {
+  if (!event.target.closest('.quick-action-wrap')) {
+    showQuickMenu.value = false
+  }
+}
+
+onMounted(() => document.addEventListener('click', onDocClick))
+onUnmounted(() => document.removeEventListener('click', onDocClick))
 
 const items = [
   { id: 'home', label: '홈', route: '/home', icon: House },
   {
-    id: 'projects',
-    label: '프로젝트',
-    route: '/projects',
+    id: 'assets',
+    label: 'ML 자산',
     icon: FolderKanban,
     children: [
-      { id: 'projectList', label: '목록', route: '/projects' },
-      { id: 'projectCreate', label: '생성 신청', route: '/projects/new' },
+      { id: 'projectList', label: '프로젝트 목록', route: '/projects' },
+      { id: 'registry', label: '모델 레지스트리', route: '/models' },
     ],
   },
   {
-    id: 'models',
-    label: '모델',
-    route: '/models',
-    icon: Boxes,
-    children: [
-      { id: 'registry', label: '레지스트리', route: '/models' },
-      { id: 'promotionInbox', label: '승격 요청', route: '/models/promotions' },
-    ],
-  },
-  {
-    id: 'monitoring',
-    label: '모니터링',
-    route: '/monitoring',
+    id: 'ops',
+    label: '관제 & 거버넌스',
     icon: Activity,
     children: [
-      { id: 'monitorStatus', label: '현황', route: '/monitoring' },
-      { id: 'thresholds', label: '기준치', route: '/monitoring/thresholds' },
-      { id: 'drift', label: '드리프트', route: '/monitoring/drift' },
-    ],
-  },
-  {
-    id: 'cost',
-    label: '비용·활용',
-    route: '/cost',
-    icon: CircleDollarSign,
-    children: [
-      { id: 'costByProject', label: '프로젝트별', route: '/cost' },
-      { id: 'costByResource', label: '리소스별', route: '/cost/resources' },
-    ],
-  },
-  {
-    id: 'lineage',
-    label: '리니지',
-    route: '/lineage',
-    icon: GitBranch,
-    children: [
-      { id: 'lineageExplore', label: '탐색', route: '/lineage' },
-      { id: 'contamination', label: '오염 구간', route: '/lineage/contamination' },
+      { id: 'monitorStatus', label: '모니터링 & 드리프트', route: '/monitoring' },
+      { id: 'lineageExplore', label: '리니지 & 오염 분석', route: '/lineage' },
+      { id: 'costByProject', label: '비용 & 리소스', route: '/cost' },
     ],
   },
   {
     id: 'support',
-    label: '지원·지식',
+    label: '지원 & 요청',
     icon: CircleHelp,
     children: [
-      { id: 'guides', label: '사용법', route: '/support/guides' },
-      { id: 'notices', label: '공지사항', route: '/support/notices' },
-    ],
-  },
-  {
-    id: 'requests',
-    label: '분석요청',
-    icon: ClipboardList,
-    children: [
-      { id: 'requestList', label: '목록', route: '/requests' },
-      { id: 'requestCreate', label: '요청하기', route: '/requests/new' },
+      { id: 'requestList', label: '분석 요청', route: '/requests' },
+      { id: 'guides', label: '가이드 & 공지사항', route: '/support/guides' },
     ],
   },
 ]
@@ -108,16 +85,33 @@ function isActive(path) {
   if (path === '/home') return route.path === '/home'
   if (path === '/projects') return route.path === '/projects'
   if (path === '/models') return route.path === '/models'
-  if (path === '/monitoring') return route.path === '/monitoring'
-  if (path === '/cost') return route.path === '/cost'
-  if (path === '/lineage') return route.path === '/lineage' || route.path.startsWith('/lineage/nodes/')
+  if (path === '/monitoring') return route.path.startsWith('/monitoring')
+  if (path === '/cost') return route.path.startsWith('/cost')
+  if (path === '/lineage') return route.path.startsWith('/lineage')
   if (path === '/requests') return route.path === '/requests' || (route.path.startsWith('/requests/') && route.path !== '/requests/new')
+  if (path === '/support/guides') return route.path.startsWith('/support')
   return route.path === path || route.path.startsWith(`${path}/`)
 }
 </script>
 
 <template>
   <nav class="snb" aria-label="주 메뉴">
+    <!-- Quick Action Button -->
+    <div class="quick-action-wrap">
+      <button class="quick-btn" type="button" @click="toggleQuickMenu">
+        <DsIcon :is="Plus" :size="16" />
+        <span>신규 요청</span>
+      </button>
+      <div v-if="showQuickMenu" class="quick-menu" role="menu">
+        <button type="button" class="quick-item" @click="handleQuickAction('/projects/new')">
+          <span>프로젝트 생성 신청</span>
+        </button>
+        <button type="button" class="quick-item" @click="handleQuickAction('/requests/new')">
+          <span>분석 요청하기</span>
+        </button>
+      </div>
+    </div>
+
     <div class="snb-main">
       <div v-for="item in items" :key="item.id" class="group">
         <RouterLink
@@ -144,6 +138,7 @@ function isActive(path) {
         </RouterLink>
       </div>
     </div>
+
     <div v-if="isAdmin" class="snb-admin">
       <p class="group-label">
         <DsIcon :is="adminItem.icon" :size="18" />
@@ -175,6 +170,66 @@ function isActive(path) {
   top: var(--ds-gnb-h);
 }
 
+.quick-action-wrap {
+  margin-bottom: var(--ds-space-3);
+  position: relative;
+}
+
+.quick-btn {
+  align-items: center;
+  background: var(--ds-primary);
+  border: none;
+  border-radius: var(--ds-radius-md);
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  font-size: var(--ds-font-label);
+  font-weight: 600;
+  gap: var(--ds-space-2);
+  justify-content: center;
+  min-height: 38px;
+  transition: opacity 0.15s ease;
+  width: 100%;
+}
+
+.quick-btn:hover {
+  opacity: 0.9;
+}
+
+.quick-menu {
+  background: var(--ds-surface);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  box-shadow: var(--ds-shadow-lg);
+  display: flex;
+  flex-direction: column;
+  left: 0;
+  padding: var(--ds-space-1);
+  position: absolute;
+  top: calc(100% + 4px);
+  width: 100%;
+  z-index: 100;
+}
+
+.quick-item {
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--ds-radius-sm);
+  color: var(--ds-text);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--ds-font-label);
+  padding: var(--ds-space-2) var(--ds-space-3);
+  text-align: left;
+  width: 100%;
+}
+
+.quick-item:hover {
+  background: var(--ds-canvas-subtle);
+  color: var(--ds-primary);
+}
+
 .snb-main {
   display: flex;
   flex: 1;
@@ -182,7 +237,7 @@ function isActive(path) {
 }
 
 .group + .group {
-  margin-top: var(--ds-space-3);
+  margin-top: var(--ds-space-2);
 }
 
 .snb-admin {
@@ -197,7 +252,7 @@ function isActive(path) {
   display: flex;
   font-size: var(--ds-font-meta);
   gap: var(--ds-space-2);
-  padding: var(--ds-space-3) var(--ds-space-2) var(--ds-space-2);
+  padding: var(--ds-space-2) var(--ds-space-2) var(--ds-space-1);
 }
 
 .item {
@@ -208,7 +263,7 @@ function isActive(path) {
   font-size: var(--ds-font-label);
   font-weight: 600;
   gap: var(--ds-space-2);
-  min-height: 36px;
+  min-height: 34px;
   padding: 0 var(--ds-space-3);
   position: relative;
 }
