@@ -51,21 +51,21 @@ const items = [
   },
   {
     id: 'ops',
-    label: '관제 & 거버넌스',
+    label: '운영 관제',
     icon: Activity,
     children: [
-      { id: 'monitorStatus', label: '모니터링 & 드리프트', route: '/monitoring' },
-      { id: 'lineageExplore', label: '리니지 & 오염 분석', route: '/lineage' },
-      { id: 'costByProject', label: '비용 & 리소스', route: '/cost' },
+      { id: 'monitorStatus', label: '모니터 현황', route: '/monitoring' },
+      { id: 'lineageExplore', label: '리니지', route: '/lineage' },
+      { id: 'costByProject', label: '비용', route: '/cost' },
     ],
   },
   {
     id: 'support',
-    label: '지원 & 요청',
+    label: '지원센터',
     icon: CircleHelp,
     children: [
       { id: 'requestList', label: '분석 요청', route: '/requests' },
-      { id: 'guides', label: '가이드 & 공지사항', route: '/support/guides' },
+      { id: 'guides', label: '사용법·공지', route: '/support/guides' },
     ],
   },
 ]
