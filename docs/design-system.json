@@ -1,0 +1,923 @@
+{
+  "meta": {
+    "name": "DSP Design System",
+    "product": "DS Platform",
+    "version": "1.0.0",
+    "locale": "ko-KR",
+    "sourceOfTruth": true,
+    "companionSpec": "./dsp-web-spec.json",
+    "description": "내부 MLOps 관제 웹의 시각 언어. Apple HIG에 가까운 흑·백 정돈 UI, 어두운 빨강 primary, 라이트/다크, 1920 기준·회의실 TV 확대. 모바일·태블릿 없음."
+  },
+  "principles": [
+    {
+      "id": "monochrome-canvas",
+      "rule": "화면의 기본 면은 검정·하양·중립 회색만 쓴다. 색은 행동·상태·포커스에만 쓴다."
+    },
+    {
+      "id": "apple-like-order",
+      "rule": "여백·정렬·1px 보더·절제된 코너로 계층을 만든다. 장식, 텍스처, 글래스, 네온을 쓰지 않는다."
+    },
+    {
+      "id": "no-shadow-no-gradient",
+      "rule": "box-shadow, text-shadow, drop-shadow, linear/radial/conic-gradient, mesh, glow는 금지."
+    },
+    {
+      "id": "cpu-first-motion",
+      "rule": "GPU가 빈약한 단말을 전제로 한다. 애니메이션은 색·투명도만, 짧게, 거의 쓰지 않는다."
+    },
+    {
+      "id": "readable-for-older-adults",
+      "rule": "본문 16px, UI 라벨 14px, 메타 최소 12px, 클릭 영역 최소 44px. 폰트 크기는 정수 px만. 가는 글씨·저대비 회색 본문을 쓰지 않는다."
+    },
+    {
+      "id": "hierarchy-before-chrome",
+      "rule": "크기·두께·색·여백 순으로 읽기 순서를 강제한다. 한 화면에 primary 행동은 하나."
+    },
+    {
+      "id": "desktop-and-tv-only",
+      "rule": "1920을 기준으로 설계하고 2560·3840에서만 확대한다. 1920 미만 레이아웃을 만들지 않는다."
+    }
+  ],
+  "constraints": {
+    "colorModel": "solid-hex-preferred",
+    "boxShadow": "none",
+    "textShadow": "none",
+    "filter": "none",
+    "backdropFilter": "none",
+    "gradient": "none",
+    "borderImage": "none",
+    "mixBlendMode": "normal",
+    "fontFamily": "system sans-serif only",
+    "minFontPx": 12,
+    "bodyFontPx": 16,
+    "minHitTargetPx": 44,
+    "preferredHitTargetPx": 48,
+    "supportedSchemes": ["light", "dark"],
+    "unsupportedViewports": ["mobile", "tablet", "touch-phone", "width < 1920"],
+    "gpuBudget": "low",
+    "willChange": "forbidden",
+    "transform3d": "forbidden",
+    "parallax": "forbidden",
+    "skeletonShimmer": "forbidden"
+  },
+  "viewport": {
+    "base": {
+      "id": "desktop-fhd",
+      "width": 1920,
+      "height": 1080,
+      "rootFontPx": 16,
+      "contentMaxWidth": 1920,
+      "pagePaddingX": 32,
+      "pagePaddingY": 24,
+      "columnGap": 24,
+      "note": "설계·컴포넌트·그리드의 원점. px 토큰은 이 해상도 기준."
+    },
+    "largeMonitor": {
+      "id": "qhd",
+      "minWidth": 2560,
+      "rootFontPx": 16,
+      "pagePaddingX": 40,
+      "pagePaddingY": 28,
+      "columnGap": 28
+    },
+    "meetingTv": {
+      "id": "uhd-tv",
+      "minWidth": 3840,
+      "rootFontPx": 16,
+      "pagePaddingX": 56,
+      "pagePaddingY": 40,
+      "columnGap": 32,
+      "note": "회의실 대형 화면. 3m 가독성. 레이아웃 구조는 유지하고 타이포 토큰만 정수 px로 한 단계 키운다."
+    },
+    "breakpoints": [
+      { "id": "base", "minWidth": 1920, "rootFontPx": 16 },
+      { "id": "largeMonitor", "minWidth": 2560, "rootFontPx": 16 },
+      { "id": "meetingTv", "minWidth": 3840, "rootFontPx": 16 }
+    ],
+    "mediaQueryPolicy": {
+      "allowed": ["min-width: 2560px", "min-width: 3840px", "prefers-color-scheme", "prefers-reduced-motion"],
+      "forbidden": ["max-width 미디어쿼리로 모바일·태블릿 레이아웃 분기", "hover-only 필수 기능", "orientation 분기"]
+    },
+    "belowBase": {
+      "policy": "unsupported",
+      "behavior": "1920 레이아웃을 가로 스크롤로 유지. 스택·햄버거·바텀시트로 축소하지 않는다."
+    }
+  },
+  "color": {
+    "brand": {
+      "name": "dark-red",
+      "hex": "#DB0000",
+      "usage": "유일한 브랜드 액센트. Primary 버튼, 포커스 링, 현재 네비, 핵심 CTA. 장식용 면 색으로 남용 금지."
+    },
+    "schemes": {
+      "light": {
+        "id": "light",
+        "colorSchemeCss": "light",
+        "canvas": "#FFFFFF",
+        "canvasSubtle": "#F5F5F7",
+        "surface": "#FFFFFF",
+        "surfaceRaised": "#FFFFFF",
+        "surfaceSunken": "#F5F5F7",
+        "overlay": "#00000073",
+        "border": "#D2D2D7",
+        "borderStrong": "#86868B",
+        "borderSubtle": "#E8E8ED",
+        "textPrimary": "#1D1D1F",
+        "textSecondary": "#515154",
+        "textTertiary": "#6E6E73",
+        "textDisabled": "#A1A1A6",
+        "textInverse": "#FFFFFF",
+        "link": "#DB0000",
+        "linkHover": "#B80000",
+        "primary": "#DB0000",
+        "primaryHover": "#B80000",
+        "primaryActive": "#8A0000",
+        "primarySubtle": "#FDECEC",
+        "onPrimary": "#FFFFFF",
+        "focusRing": "#DB0000",
+        "selectionBg": "#FDECEC",
+        "selectionFg": "#1D1D1F",
+        "success": "#0F6B3C",
+        "successSubtle": "#E6F4EC",
+        "onSuccess": "#FFFFFF",
+        "warning": "#8A5A00",
+        "warningSubtle": "#F8F0DE",
+        "onWarning": "#FFFFFF",
+        "danger": "#DB0000",
+        "dangerSubtle": "#FDECEC",
+        "onDanger": "#FFFFFF",
+        "info": "#3A3A3C",
+        "infoSubtle": "#F2F2F7",
+        "onInfo": "#FFFFFF",
+        "neutral": "#6E6E73",
+        "neutralSubtle": "#F5F5F7",
+        "onNeutral": "#1D1D1F",
+        "chart": {
+          "grid": "#E8E8ED",
+          "axis": "#6E6E73",
+          "series": ["#1D1D1F", "#DB0000", "#515154", "#0F6B3C", "#8A5A00", "#86868B"]
+        }
+      },
+      "dark": {
+        "id": "dark",
+        "colorSchemeCss": "dark",
+        "canvas": "#000000",
+        "canvasSubtle": "#1C1C1E",
+        "surface": "#1C1C1E",
+        "surfaceRaised": "#2C2C2E",
+        "surfaceSunken": "#000000",
+        "overlay": "#000000B3",
+        "border": "#3A3A3C",
+        "borderStrong": "#636366",
+        "borderSubtle": "#2C2C2E",
+        "textPrimary": "#F5F5F7",
+        "textSecondary": "#C7C7CC",
+        "textTertiary": "#A1A1A6",
+        "textDisabled": "#636366",
+        "textInverse": "#1D1D1F",
+        "link": "#FF5C5C",
+        "linkHover": "#FF8080",
+        "primary": "#DB0000",
+        "primaryHover": "#FF2A2A",
+        "primaryActive": "#B80000",
+        "primarySubtle": "#3A0A0A",
+        "onPrimary": "#FFFFFF",
+        "focusRing": "#FF5C5C",
+        "selectionBg": "#3A0A0A",
+        "selectionFg": "#F5F5F7",
+        "success": "#30A46C",
+        "successSubtle": "#0F2A1C",
+        "onSuccess": "#000000",
+        "warning": "#E0A21B",
+        "warningSubtle": "#2A2108",
+        "onWarning": "#000000",
+        "danger": "#FF5C5C",
+        "dangerSubtle": "#3A0A0A",
+        "onDanger": "#000000",
+        "info": "#C7C7CC",
+        "infoSubtle": "#2C2C2E",
+        "onInfo": "#000000",
+        "neutral": "#A1A1A6",
+        "neutralSubtle": "#2C2C2E",
+        "onNeutral": "#F5F5F7",
+        "chart": {
+          "grid": "#2C2C2E",
+          "axis": "#A1A1A6",
+          "series": ["#F5F5F7", "#FF5C5C", "#C7C7CC", "#30A46C", "#E0A21B", "#86868B"]
+        }
+      }
+    },
+    "semanticMap": {
+      "pageBackground": "canvas",
+      "shellBackground": "canvasSubtle",
+      "cardBackground": "surface",
+      "modalBackground": "surfaceRaised",
+      "tableHeaderBackground": "surfaceSunken",
+      "gnbBackground": "surface",
+      "snbBackground": "canvasSubtle",
+      "snbActiveBackground": "primarySubtle",
+      "snbActiveForeground": "primary",
+      "inputBackground": "surface",
+      "inputBorder": "border",
+      "inputBorderFocus": "primary",
+      "divider": "borderSubtle",
+      "kpiValue": "textPrimary",
+      "kpiAlertValue": "danger"
+    },
+    "statusChips": {
+      "note": "dsp-web-spec.json uiPatterns.statusChips 톤과 맞춘다. 면은 subtle, 글자·보더는 해당 시맨틱 색.",
+      "neutral": { "bg": "neutralSubtle", "fg": "textPrimary", "border": "border" },
+      "info": { "bg": "infoSubtle", "fg": "textPrimary", "border": "border" },
+      "success": { "bg": "successSubtle", "fg": "success", "border": "success" },
+      "warning": { "bg": "warningSubtle", "fg": "warning", "border": "warning" },
+      "danger": { "bg": "dangerSubtle", "fg": "danger", "border": "danger" }
+    },
+    "rules": [
+      "그라디언트 금지. 호버는 토큰으로 정의된 단색 치환만.",
+      "투명 색은 overlay·disabled 외 금지. 보더·면에 rgba 그림자를 흉내 내지 않는다.",
+      "primary는 CTA·포커스·현재 위치·링크에만. 차트 전 시리즈를 primary로 칠하지 않는다.",
+      "본문 텍스트는 textPrimary. textTertiary는 메타(시간, 단위, 힌트)만.",
+      "라이트에서 본문 대비는 최소 7:1 목표(AAA 본문). textSecondary도 4.5:1 이상."
+    ]
+  },
+  "typography": {
+    "fontFamily": {
+      "sans": "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+      "mono": "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+      "icon": null,
+      "rules": [
+        "웹폰트·아이콘폰트·가변폰트 파일 로드 없음. 시스템 sans-serif만.",
+        "본문·UI는 sans. 코드·ID·메트릭 원값은 mono.",
+        "font-synthesis: none. 가짜 볼드/이탤릭 금지."
+      ]
+    },
+    "rendering": {
+      "fontSmoothing": "antialiased",
+      "textRendering": "optimizeLegibility",
+      "hyphens": "none",
+      "wordBreak": "keep-all",
+      "lineBreak": "strict",
+      "tabularNums": "KPI, 테이블 숫자, 비용, 퍼센트에 font-variant-numeric: tabular-nums"
+    },
+    "minimums": {
+      "uiLabelPx": 14,
+      "bodyPx": 16,
+      "captionPx": 12,
+      "note": "모든 font-size는 정수 px. rem·소수점 px 금지. 메타만 12px. 라벨 14px. 본문 16px."
+    },
+    "scale": {
+      "note": "1920 기준 정수 px. rem으로 쓰지 않는다. 2560·3840은 아래 viewportScale의 정수 px로만 올린다.",
+      "display": {
+        "sizePx": 32,
+        "lineHeight": 1.2,
+        "weight": 600,
+        "letterSpacing": "-0.03em",
+        "color": "textPrimary",
+        "usage": "페이지 타이틀 1개. 한 화면에 하나."
+      },
+      "titleLg": {
+        "sizePx": 28,
+        "lineHeight": 1.25,
+        "weight": 600,
+        "letterSpacing": "-0.025em",
+        "color": "textPrimary",
+        "usage": "대시보드 KPI 숫자, 회의실 핵심 수치"
+      },
+      "title": {
+        "sizePx": 24,
+        "lineHeight": 1.3,
+        "weight": 600,
+        "letterSpacing": "-0.02em",
+        "color": "textPrimary",
+        "usage": "섹션 제목, 모달 제목"
+      },
+      "titleSm": {
+        "sizePx": 18,
+        "lineHeight": 1.35,
+        "weight": 600,
+        "letterSpacing": "-0.01em",
+        "color": "textPrimary",
+        "usage": "카드 제목, 테이블 그룹, 드로어 제목"
+      },
+      "body": {
+        "sizePx": 16,
+        "lineHeight": 1.5,
+        "weight": 400,
+        "letterSpacing": "0",
+        "color": "textPrimary",
+        "usage": "본문, 폼 값, 테이블 셀"
+      },
+      "bodyStrong": {
+        "sizePx": 16,
+        "lineHeight": 1.5,
+        "weight": 600,
+        "letterSpacing": "0",
+        "color": "textPrimary",
+        "usage": "본문 강조, 테이블에서 식별자(프로젝트명)"
+      },
+      "label": {
+        "sizePx": 14,
+        "lineHeight": 1.4,
+        "weight": 600,
+        "letterSpacing": "0",
+        "color": "textPrimary",
+        "usage": "폼 라벨, 탭, 네비 항목, 버튼 텍스트"
+      },
+      "meta": {
+        "sizePx": 12,
+        "lineHeight": 1.4,
+        "weight": 400,
+        "letterSpacing": "0",
+        "color": "textSecondary",
+        "usage": "도움말, 타임스탬프, 보조 설명. 최소 크기."
+      }
+    },
+    "viewportScale": {
+      "note": "토큰별 정수 px. html root는 16px 고정. rem으로 비례 확대하지 않는다.",
+      "largeMonitor": {
+        "minWidth": 2560,
+        "meta": 14,
+        "label": 16,
+        "body": 18,
+        "titleSm": 20,
+        "title": 26,
+        "titleLg": 32,
+        "display": 36
+      },
+      "meetingTv": {
+        "minWidth": 3840,
+        "meta": 16,
+        "label": 18,
+        "body": 20,
+        "titleSm": 24,
+        "title": 32,
+        "titleLg": 40,
+        "display": 48
+      }
+    },
+    "hierarchyRules": [
+      "display > titleLg > title > titleSm > bodyStrong > body > label > meta 순으로 읽히게 한다.",
+      "제목 위 여백은 제목 아래 여백보다 크다 (space.8 위, space.3 아래를 기본).",
+      "제목을 색으로만 구분하지 않는다. 크기+두께가 1차, 색은 2차.",
+      "이탤릭·밑줄·전각 장식 폰트로 계층을 만들지 않는다.",
+      "한 카드 안에서 타입 스텝을 3단계 넘게 섞지 않는다."
+    ]
+  },
+  "iconography": {
+    "style": "stroke",
+    "strokeWidthPx": 1.75,
+    "corner": "round",
+    "color": "currentColor",
+    "sizesPx": {
+      "sm": 20,
+      "md": 24,
+      "lg": 28,
+      "gnb": 24
+    },
+    "minSizePx": 20,
+    "rules": [
+      "16px 이하 아이콘 금지.",
+      "다색 채움 아이콘·브랜드 그라디언트 아이콘 금지.",
+      "아이콘만으로 의미를 전달하지 않는다. 인접 라벨 필수. GNB 알림 등 예외는 aria-label.",
+      "상태 아이콘은 시맨틱 색 + 텍스트 병기 (색맹 대비)."
+    ]
+  },
+  "spacing": {
+    "unitPx": 4,
+    "scale": {
+      "0": 0,
+      "1": 4,
+      "2": 8,
+      "3": 12,
+      "4": 16,
+      "5": 20,
+      "6": 24,
+      "7": 32,
+      "8": 40,
+      "9": 48,
+      "10": 64
+    },
+    "usage": {
+      "controlPaddingX": 16,
+      "controlPaddingY": 12,
+      "cardPadding": 24,
+      "sectionGap": 32,
+      "stackGapTight": 8,
+      "stackGap": 16,
+      "stackGapLoose": 24,
+      "formRowGap": 20,
+      "inlineGap": 8,
+      "pagePaddingX": 32,
+      "pagePaddingY": 24
+    },
+    "rules": [
+      "4의 배수만 사용.",
+      "컴포넌트 내부는 타이트, 섹션 사이는 느슨. 밀도는 'comfortable'.",
+      "시각 계층: 관련 있는 것끼리 space.2–3, 다른 그룹은 space.6–8."
+    ]
+  },
+  "sizing": {
+    "control": {
+      "sm": { "heightPx": 40, "font": "label", "paddingX": 12 },
+      "md": { "heightPx": 44, "font": "label", "paddingX": 16 },
+      "lg": { "heightPx": 48, "font": "label", "paddingX": 20 }
+    },
+    "defaultControl": "md",
+    "hitTargetMinPx": 44,
+    "inputWidth": {
+      "sm": 160,
+      "md": 280,
+      "lg": 420,
+      "full": "100%"
+    },
+    "iconButton": { "sizePx": 44 },
+    "chip": { "heightPx": 28, "paddingX": 10, "font": "meta" },
+    "tableRowMinPx": 52,
+    "gnbHeightPx": 64,
+    "snbWidthPx": 260,
+    "snbItemHeightPx": 44,
+    "modal": {
+      "sm": 480,
+      "md": 640,
+      "lg": 880
+    },
+    "drawerWidthPx": 480
+  },
+  "radius": {
+    "none": 0,
+    "sm": 6,
+    "md": 8,
+    "lg": 12,
+    "pill": 999,
+    "usage": {
+      "button": "md",
+      "input": "md",
+      "card": "lg",
+      "chip": "sm",
+      "modal": "lg",
+      "checkbox": "sm",
+      "avatar": "pill"
+    },
+    "rules": [
+      "과도한 24px+ 라운드 금지. Apple 설정/메일 수준의 절제.",
+      "테이블·페이지 셸·GNB는 radius 0. 떠 있는 면(카드·모달·팝오버)만 라운드."
+    ]
+  },
+  "border": {
+    "width": {
+      "hairline": 1,
+      "strong": 2
+    },
+    "style": "solid",
+    "default": { "width": 1, "style": "solid", "color": "border" },
+    "focus": { "width": 2, "style": "solid", "color": "focusRing", "offsetPx": 2 },
+    "rules": [
+      "구분·엘리베이션은 보더와 배경 단계로만 표현.",
+      "2px 보더는 포커스·선택된 탭·현재 SNB·에러 입력에만.",
+      "dashed/dotted는 드롭존 외 금지."
+    ]
+  },
+  "elevation": {
+    "method": "background-step + 1px border",
+    "boxShadow": "none",
+    "levels": {
+      "0": { "bg": "canvas", "border": "none", "usage": "페이지" },
+      "1": { "bg": "canvasSubtle", "border": "none", "usage": "SNB, 그룹 배경" },
+      "2": { "bg": "surface", "border": "border", "usage": "카드, 테이블, 입력" },
+      "3": { "bg": "surfaceRaised", "border": "border", "usage": "모달, 팝오버, 드롭다운" }
+    },
+    "overlay": {
+      "scrim": "overlay",
+      "blur": false,
+      "note": "모달 뒤는 단색 스크림만. glassmorphism 금지."
+    }
+  },
+  "motion": {
+    "policy": "minimal-cpu",
+    "default": "none",
+    "allowedProperties": ["color", "background-color", "border-color", "opacity"],
+    "forbiddenProperties": [
+      "transform",
+      "translate",
+      "scale",
+      "rotate",
+      "filter",
+      "box-shadow",
+      "width",
+      "height",
+      "top",
+      "left",
+      "margin",
+      "padding"
+    ],
+    "durationMs": {
+      "none": 0,
+      "instant": 80,
+      "fast": 120
+    },
+    "easing": "linear",
+    "usage": {
+      "hoverColor": { "duration": "instant", "property": "background-color" },
+      "focusRing": { "duration": "none" },
+      "overlayEnter": { "duration": "fast", "property": "opacity" },
+      "toastEnter": { "duration": "fast", "property": "opacity" }
+    },
+    "forbiddenMotion": [
+      "페이지 전환 슬라이드",
+      "레이아웃 스프링",
+      "스켈레톤 쉬머",
+      "스피너 그라디언트 회전 — 스피너는 1px 보더 + 단색 스윕도 피하고 정적 '처리 중' 텍스트+점 3개를 우선",
+      "차트 진입 애니메이션",
+      "hover lift (translateY / shadow)",
+      "accordion 높이 애니메이션 — 즉시 열림/닫힘"
+    ],
+    "prefersReducedMotion": {
+      "media": "(prefers-reduced-motion: reduce)",
+      "behavior": "모든 transition/animation duration 0. 이 미디어쿼리는 필수 구현."
+    },
+    "loading": {
+      "preferred": "정적 텍스트 '불러오는 중' + 비활성 면(surfaceSunken)",
+      "spinner": {
+        "allowed": false,
+        "reason": "회전은 GPU/컴포지터를 자극한다. 회의실 저사양·원격 데스크톱에서 끊긴다."
+      }
+    }
+  },
+  "zIndex": {
+    "base": 0,
+    "stickyHeader": 10,
+    "gnb": 20,
+    "dropdown": 30,
+    "popover": 40,
+    "overlay": 50,
+    "modal": 60,
+    "toast": 70
+  },
+  "layout": {
+    "shell": {
+      "type": "gnb + snb + main",
+      "gnb": {
+        "position": "sticky-top",
+        "heightPx": 64,
+        "bg": "surface",
+        "borderBottom": "border",
+        "paddingX": 24,
+        "gap": 16,
+        "left": "wordmark 텍스트. 로고 마크가 있으면 단색 currentColor, 24px",
+        "center": "글로벌 검색. 높이 44, 최대 너비 560",
+        "right": "결재함, 알림, 모니터링, 아바타. 아이콘+라벨 병기 권장"
+      },
+      "snb": {
+        "position": "sticky-left",
+        "widthPx": 260,
+        "bg": "canvasSubtle",
+        "borderRight": "border",
+        "itemHeightPx": 44,
+        "itemRadius": "md",
+        "itemPaddingX": 12,
+        "active": {
+          "bg": "primarySubtle",
+          "fg": "primary",
+          "weight": 600,
+          "border": "none",
+          "indicator": "왼쪽 3px solid primary. 그라디언트/그림자 없음"
+        },
+        "groupLabel": { "font": "meta", "color": "textTertiary", "padding": "16 12 8" }
+      },
+      "main": {
+        "bg": "canvas",
+        "padding": { "x": 32, "y": 24 },
+        "minWidthPx": 1660,
+        "header": {
+          "title": "display",
+          "description": "meta",
+          "actions": "오른쪽 정렬. primary 버튼 최대 1개"
+        }
+      }
+    },
+    "grid": {
+      "columns": 12,
+      "gapPx": 24,
+      "cardMinWidthPx": 360,
+      "kpiPerRow": 4,
+      "note": "홈 KPI는 4열 고정. 1920 미만으로 접지 않음."
+    },
+    "density": {
+      "id": "comfortable",
+      "tableCellPaddingY": 14,
+      "tableCellPaddingX": 16,
+      "formLabelGap": 8
+    }
+  },
+  "visualHierarchy": {
+    "page": [
+      "1. 페이지 타이틀(display)과 단 하나의 primary CTA",
+      "2. 주의 배너(있을 때만). danger/warning subtle 면 + 1px 보더 + 본문 16px",
+      "3. KPI 또는 필터. KPI 숫자는 titleLg, 라벨은 meta",
+      "4. 주 콘텐츠(표·카드·폼)",
+      "5. 보조 설명·타임스탬프는 meta"
+    ],
+    "emphasis": {
+      "primaryAction": "filled primary, height md+",
+      "secondaryAction": "outline, border + textPrimary, bg surface",
+      "tertiaryAction": "텍스트만, color link, underline 없음. hover 시 color linkHover",
+      "destructiveAction": "outline danger. 최종 확인 모달의 확인만 filled danger"
+    },
+    "scanOrder": {
+      "weight": "600은 제목·식별자·버튼·활성 네비만",
+      "color": "본문은 textPrimary. primary 색 텍스트는 링크·활성·오류",
+      "size": "숫자가 의사결정 핵심이면 title 이상으로 키운다",
+      "space": "그룹 사이 space.7 이상. 그룹 안 space.3–4",
+      "border": "카드·표·입력만 보더. 장식 라인 남발 금지"
+    },
+    "doNot": [
+      "여러 filled primary 버튼을 한 헤더에 나란히 두지 않는다",
+      "모든 숫자를 primary 색으로 칠하지 않는다",
+      "배경을 칸마다 다른 색으로 나누지 않는다",
+      "아이콘 크기로 계층을 만들지 않는다"
+    ]
+  },
+  "components": {
+    "button": {
+      "variants": {
+        "primary": { "bg": "primary", "fg": "onPrimary", "border": "primary", "hoverBg": "primaryHover", "activeBg": "primaryActive" },
+        "secondary": { "bg": "surface", "fg": "textPrimary", "border": "borderStrong", "hoverBg": "canvasSubtle" },
+        "ghost": { "bg": "transparent", "fg": "textPrimary", "border": "transparent", "hoverBg": "canvasSubtle" },
+        "danger": { "bg": "surface", "fg": "danger", "border": "danger", "hoverBg": "dangerSubtle" },
+        "dangerFilled": { "bg": "danger", "fg": "onDanger", "border": "danger", "hoverBg": "primaryHover" }
+      },
+      "sizeDefault": "md",
+      "disabled": { "bg": "neutralSubtle", "fg": "textDisabled", "border": "border", "pointer": "none" },
+      "rules": ["그림자·그라디언트·hover lift 없음", "아이콘+라벨 간격 8px", "로딩 시 라벨을 '처리 중'으로 바꾸고 disabled"]
+    },
+    "iconButton": {
+      "sizePx": 44,
+      "bg": "transparent",
+      "hoverBg": "canvasSubtle",
+      "radius": "md",
+      "mustHaveAriaLabel": true
+    },
+    "input": {
+      "heightPx": 44,
+      "bg": "surface",
+      "border": "border",
+      "radius": "md",
+      "font": "body",
+      "placeholder": "textTertiary",
+      "focus": { "border": "primary", "width": 2, "shadow": "none" },
+      "error": { "border": "danger", "width": 2, "message": { "font": "meta", "color": "danger" } },
+      "disabled": { "bg": "surfaceSunken", "fg": "textDisabled" }
+    },
+    "select": { "sameAs": "input", "chevron": { "sizePx": 20, "color": "textSecondary" } },
+    "checkboxRadio": {
+      "sizePx": 20,
+      "border": "borderStrong",
+      "checkedBg": "primary",
+      "checkedFg": "onPrimary",
+      "labelGap": 8,
+      "labelFont": "body"
+    },
+    "search": {
+      "heightPx": 44,
+      "maxWidthPx": 560,
+      "bg": "surfaceSunken",
+      "border": "border",
+      "focusBorder": "primary"
+    },
+    "card": {
+      "bg": "surface",
+      "border": "border",
+      "radius": "lg",
+      "padding": 24,
+      "gap": 12,
+      "shadow": "none",
+      "hover": "없음. 클릭 가능 카드는 포커스 링 + 커서 pointer만"
+    },
+    "table": {
+      "bg": "surface",
+      "border": "border",
+      "radius": 0,
+      "header": { "bg": "surfaceSunken", "font": "label", "color": "textSecondary", "sticky": true, "heightPx": 48 },
+      "row": { "minHeightPx": 52, "borderBottom": "borderSubtle", "hoverBg": "canvasSubtle", "selectedBg": "primarySubtle" },
+      "cellFont": "body",
+      "numeric": "tabular-nums",
+      "empty": { "paddingY": 64, "font": "body", "color": "textSecondary" }
+    },
+    "chip": {
+      "heightPx": 28,
+      "radius": "sm",
+      "font": "meta",
+      "paddingX": 10,
+      "border": true,
+      "shadow": "none"
+    },
+    "tabs": {
+      "heightPx": 44,
+      "font": "label",
+      "inactive": "textSecondary",
+      "active": { "fg": "textPrimary", "indicator": "2px solid primary, 하단" },
+      "divider": "1px borderSubtle 하단 전폭"
+    },
+    "modal": {
+      "bg": "surfaceRaised",
+      "border": "border",
+      "radius": "lg",
+      "padding": 32,
+      "scrim": "overlay",
+      "shadow": "none",
+      "title": "title",
+      "enter": "opacity 120ms linear only"
+    },
+    "popover": {
+      "bg": "surfaceRaised",
+      "border": "border",
+      "radius": "md",
+      "padding": 12,
+      "shadow": "none"
+    },
+    "banner": {
+      "padding": 16,
+      "radius": "md",
+      "border": "1px semantic",
+      "font": "body",
+      "icon": 24
+    },
+    "toast": {
+      "bg": "surfaceRaised",
+      "border": "border",
+      "radius": "md",
+      "padding": 16,
+      "shadow": "none",
+      "position": "top-center",
+      "maxWidthPx": 480,
+      "motion": "opacity only"
+    },
+    "pagination": {
+      "itemSizePx": 44,
+      "font": "label",
+      "active": { "bg": "primary", "fg": "onPrimary" }
+    },
+    "breadcrumb": {
+      "font": "meta",
+      "separator": "/",
+      "current": "textPrimary weight 600"
+    },
+    "definitionList": {
+      "layout": "2-col grid. term 128px, description 1fr, column-gap 16",
+      "row": { "minHeightPx": 44, "paddingY": 14, "borderBottom": "borderSubtle", "align": "baseline" },
+      "term": { "font": "label", "color": "textSecondary" },
+      "description": { "font": "body", "color": "textPrimary", "margin": 0 },
+      "rules": [
+        "dd 브라우저 기본 들여쓰기 제거",
+        "라벨과 값을 세로로 쌓지 않고 한 행에 둔다",
+        "값은 본문 16px, 라벨은 14px 600. 첫 줄 베이스라인 정렬"
+      ]
+    }
+  },
+  "dataVisualization": {
+    "rules": [
+      "차트 면·선·막대는 단색. 그라디언트 에어리어 차트 금지.",
+      "선 두께 최소 2px. 회의실(3840)에서는 3px.",
+      "범례는 meta(12px) 이상, 색점 12px 이상. 색만으로 구분하지 않고 라벨 병기.",
+      "그리드는 hairline solid. 점선 그리드 남발 금지.",
+      "툴팁: 단색 surfaceRaised + 1px border. 그림자 없음.",
+      "애니메이션 진입/트랜지션 없음. 데이터 교체 즉시 렌더.",
+      "도넛은 원형 스트로크 단색 세그먼트. 가운데 숫자는 titleLg."
+    ],
+    "palette": "scheme.chart.series 순서 고정. 시리즈 1은 중립 잉크, 시리즈 2가 primary red."
+  },
+  "accessibility": {
+    "target": ["older-adults", "meeting-room-distance", "keyboard", "low-gpu"],
+    "contrast": {
+      "body": "AAA 7:1 목표",
+      "ui": "AA 4.5:1 필수",
+      "largeText": "AA 3:1 하한, 실제는 그 이상"
+    },
+    "focus": {
+      "visibleAlways": true,
+      "ring": "2px solid focusRing, offset 2px",
+      "shadow": "none"
+    },
+    "keyboard": {
+      "tabOrder": "GNB → SNB → main",
+      "skipLink": "본문으로",
+      "modal": "포커스 트랩"
+    },
+    "colorBlind": "성공/실패는 칩 텍스트(정상/실패) 필수. 색점만 금지.",
+    "reducedMotion": "필수 준수",
+    "hitArea": "44px 최소, 아이콘 버튼 포함"
+  },
+  "theming": {
+    "default": "light",
+    "dark": "supported",
+    "switch": {
+      "sources": ["user preference in settings", "prefers-color-scheme fallback"],
+      "storage": "local setting, 세션 유지",
+      "noFlash": "html[data-theme] 토큰 스위치. 중간 그라디언트 페이드 없음"
+    },
+    "tokenSwitch": "같은 시맨틱 토큰명. 스킴별 값만 교체.",
+    "images": "아이콘은 currentColor. invert 필터 남용 금지."
+  },
+  "forbidden": [
+    "box-shadow, drop-shadow, text-shadow",
+    "linear-gradient, radial-gradient, conic-gradient, background-image 장식",
+    "backdrop-filter, blur, saturate 글래스",
+    "transform 기반 호버(lift, scale, rotate)",
+    "3D perspective, parallax, particle, lottie 장식",
+    "웹폰트 파일, 장식 세리프, 손글씨",
+    "11px 이하 글자, 소수점 font-size, rem font-size",
+    "모바일 브레이크포인트, 햄버거, 바텀 탭, 스와이프 제스처 필수화",
+    "primary 외 브랜드 컬러(퍼플, 네온 블루, 오렌지 액센트)",
+    "카드마다 다른 배경 틴트",
+    "스켈레톤 쉬머, 인디터미넌트 그라디언트 프로그레스"
+  ],
+  "implementation": {
+    "html": {
+      "rootAttributes": ["data-theme='light'|'dark'", "lang='ko'"],
+      "cssColorScheme": "light dark"
+    },
+    "cssCustomProperties": {
+      "note": "스킴 값은 :root[data-theme='light'|'dark']에 매핑. 컴포넌트는 var(--ds-*)만 참조.",
+      "prefix": "--ds-",
+      "map": {
+        "--ds-canvas": "canvas",
+        "--ds-canvas-subtle": "canvasSubtle",
+        "--ds-surface": "surface",
+        "--ds-surface-raised": "surfaceRaised",
+        "--ds-surface-sunken": "surfaceSunken",
+        "--ds-overlay": "overlay",
+        "--ds-border": "border",
+        "--ds-border-strong": "borderStrong",
+        "--ds-border-subtle": "borderSubtle",
+        "--ds-text": "textPrimary",
+        "--ds-text-secondary": "textSecondary",
+        "--ds-text-tertiary": "textTertiary",
+        "--ds-text-disabled": "textDisabled",
+        "--ds-text-inverse": "textInverse",
+        "--ds-link": "link",
+        "--ds-link-hover": "linkHover",
+        "--ds-primary": "primary",
+        "--ds-primary-hover": "primaryHover",
+        "--ds-primary-active": "primaryActive",
+        "--ds-primary-subtle": "primarySubtle",
+        "--ds-on-primary": "onPrimary",
+        "--ds-focus": "focusRing",
+        "--ds-success": "success",
+        "--ds-success-subtle": "successSubtle",
+        "--ds-warning": "warning",
+        "--ds-warning-subtle": "warningSubtle",
+        "--ds-danger": "danger",
+        "--ds-danger-subtle": "dangerSubtle",
+        "--ds-info": "info",
+        "--ds-info-subtle": "infoSubtle",
+        "--ds-font-sans": "typography.fontFamily.sans",
+        "--ds-font-mono": "typography.fontFamily.mono",
+        "--ds-font-meta": "12px",
+        "--ds-font-label": "14px",
+        "--ds-font-body": "16px",
+        "--ds-font-title-sm": "18px",
+        "--ds-font-title": "24px",
+        "--ds-font-title-lg": "28px",
+        "--ds-font-display": "32px",
+        "--ds-radius-sm": "6px",
+        "--ds-radius-md": "8px",
+        "--ds-radius-lg": "12px",
+        "--ds-space-unit": "4px",
+        "--ds-control-h": "44px",
+        "--ds-gnb-h": "64px",
+        "--ds-snb-w": "260px",
+        "--ds-duration": "80ms",
+        "--ds-easing": "linear"
+      }
+    },
+    "rootFont": [
+      { "minWidth": 1920, "htmlFontSize": "16px" },
+      { "minWidth": 2560, "htmlFontSize": "16px" },
+      { "minWidth": 3840, "htmlFontSize": "16px" }
+    ],
+    "globalCssRules": [
+      "* { box-sizing: border-box; }",
+      "body { margin: 0; background: var(--ds-canvas); color: var(--ds-text); font-family: var(--ds-font-sans); font-size: var(--ds-font-body); line-height: 1.5; }",
+      "button, input, select, textarea { font: inherit; }",
+      "*:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 2px; }",
+      "@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }"
+    ]
+  },
+  "aiImplementationPrompt": {
+    "instruction": "이 JSON을 DSP 웹 UI의 단일 시각 소스로 사용하라. 색·타입·간격·보더·모션은 여기 토큰만. dsp-web-spec.json의 페이지·권한·카피와 함께 구현하되, 스펙의 레이아웃 구조(GNB/SNB)를 이 셸 토큰으로 그린다.",
+    "must": [
+      "라이트·다크 시맨틱 토큰을 CSS 변수로 구현",
+      "box-shadow 0, background gradient 없음",
+      "본문 16px, 라벨 14px, 메타 12px. font-size는 정수 px만",
+      "1920 기준, min-width 2560/3840에서 타이포 토큰만 정수 px로 확대. html root는 16px 고정",
+      "모바일/태블릿 레이아웃 분기 없음",
+      "모션은 color/opacity ≤ 120ms, prefers-reduced-motion 시 0",
+      "한 뷰 primary filled 버튼 1개"
+    ],
+    "mustNot": [
+      "Vite 템플릿의 퍼플 액센트·그림자·1024 브레이크포인트 재사용",
+      "웹폰트 로드",
+      "GPU 유발 transform/filter/will-change"
+    ]
+  }
+}

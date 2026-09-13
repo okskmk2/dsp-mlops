@@ -1,0 +1,397 @@
+:root {
+  --ds-font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ds-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --ds-font-meta: 12px;
+  --ds-font-label: 14px;
+  --ds-font-body: 16px;
+  --ds-font-title-sm: 18px;
+  --ds-font-title: 24px;
+  --ds-font-title-lg: 28px;
+  --ds-font-display: 32px;
+  --ds-radius-sm: 0.3333rem;
+  --ds-radius-md: 0.4444rem;
+  --ds-radius-lg: 0.6667rem;
+  --ds-space-unit: 0.2222rem;
+  --ds-space-1: 0.2222rem;
+  --ds-space-2: 0.4444rem;
+  --ds-space-3: 0.6667rem;
+  --ds-space-4: 0.8889rem;
+  --ds-space-5: 1.1111rem;
+  --ds-space-6: 1.3333rem;
+  --ds-space-7: 1.7778rem;
+  --ds-space-8: 2.2222rem;
+  --ds-space-9: 2.6667rem;
+  --ds-space-10: 3.5556rem;
+  --ds-control-h: 2.4444rem;
+  --ds-control-h-sm: 2.2222rem;
+  --ds-control-h-lg: 2.6667rem;
+  --ds-gnb-h: 3.5556rem;
+  --ds-snb-w: 14.4444rem;
+  --ds-duration: 80ms;
+  --ds-duration-fast: 120ms;
+  --ds-easing: linear;
+  --ds-icon-sm: 1.1111rem;
+  --ds-icon-md: 1.3333rem;
+  --ds-icon-lg: 1.5556rem;
+  --ds-z-gnb: 20;
+  --ds-z-dropdown: 30;
+  --ds-z-popover: 40;
+  --ds-z-overlay: 50;
+  --ds-z-modal: 60;
+  --ds-z-toast: 70;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --ds-canvas: #ffffff;
+  --ds-canvas-subtle: #f5f5f7;
+  --ds-surface: #ffffff;
+  --ds-surface-raised: #ffffff;
+  --ds-surface-sunken: #f5f5f7;
+  --ds-overlay: #00000073;
+  --ds-border: #d2d2d7;
+  --ds-border-strong: #86868b;
+  --ds-border-subtle: #e8e8ed;
+  --ds-text: #1d1d1f;
+  --ds-text-secondary: #515154;
+  --ds-text-tertiary: #6e6e73;
+  --ds-text-disabled: #a1a1a6;
+  --ds-text-inverse: #ffffff;
+  --ds-link: #db0000;
+  --ds-link-hover: #b80000;
+  --ds-primary: #db0000;
+  --ds-primary-hover: #b80000;
+  --ds-primary-active: #8a0000;
+  --ds-primary-subtle: #fdecec;
+  --ds-on-primary: #ffffff;
+  --ds-focus: #db0000;
+  --ds-selection-bg: #fdecec;
+  --ds-selection-fg: #1d1d1f;
+  --ds-success: #0f6b3c;
+  --ds-success-subtle: #e6f4ec;
+  --ds-on-success: #ffffff;
+  --ds-warning: #8a5a00;
+  --ds-warning-subtle: #f8f0de;
+  --ds-on-warning: #ffffff;
+  --ds-danger: #db0000;
+  --ds-danger-subtle: #fdecec;
+  --ds-on-danger: #ffffff;
+  --ds-info: #3a3a3c;
+  --ds-info-subtle: #f2f2f7;
+  --ds-on-info: #ffffff;
+  --ds-neutral: #6e6e73;
+  --ds-neutral-subtle: #f5f5f7;
+  --ds-on-neutral: #1d1d1f;
+  --ds-chart-1: #1d1d1f;
+  --ds-chart-2: #db0000;
+  --ds-chart-3: #515154;
+  --ds-chart-4: #0f6b3c;
+  --ds-chart-5: #8a5a00;
+  --ds-chart-6: #86868b;
+  --ds-chart-grid: #e8e8ed;
+  --ds-chart-axis: #6e6e73;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --ds-canvas: #000000;
+  --ds-canvas-subtle: #1c1c1e;
+  --ds-surface: #1c1c1e;
+  --ds-surface-raised: #2c2c2e;
+  --ds-surface-sunken: #000000;
+  --ds-overlay: #000000b3;
+  --ds-border: #3a3a3c;
+  --ds-border-strong: #636366;
+  --ds-border-subtle: #2c2c2e;
+  --ds-text: #f5f5f7;
+  --ds-text-secondary: #c7c7cc;
+  --ds-text-tertiary: #a1a1a6;
+  --ds-text-disabled: #636366;
+  --ds-text-inverse: #1d1d1f;
+  --ds-link: #ff5c5c;
+  --ds-link-hover: #ff8080;
+  --ds-primary: #db0000;
+  --ds-primary-hover: #ff2a2a;
+  --ds-primary-active: #b80000;
+  --ds-primary-subtle: #3a0a0a;
+  --ds-on-primary: #ffffff;
+  --ds-focus: #ff5c5c;
+  --ds-selection-bg: #3a0a0a;
+  --ds-selection-fg: #f5f5f7;
+  --ds-success: #30a46c;
+  --ds-success-subtle: #0f2a1c;
+  --ds-on-success: #000000;
+  --ds-warning: #e0a21b;
+  --ds-warning-subtle: #2a2108;
+  --ds-on-warning: #000000;
+  --ds-danger: #ff5c5c;
+  --ds-danger-subtle: #3a0a0a;
+  --ds-on-danger: #000000;
+  --ds-info: #c7c7cc;
+  --ds-info-subtle: #2c2c2e;
+  --ds-on-info: #000000;
+  --ds-neutral: #a1a1a6;
+  --ds-neutral-subtle: #2c2c2e;
+  --ds-on-neutral: #f5f5f7;
+  --ds-chart-1: #f5f5f7;
+  --ds-chart-2: #ff5c5c;
+  --ds-chart-3: #c7c7cc;
+  --ds-chart-4: #30a46c;
+  --ds-chart-5: #e0a21b;
+  --ds-chart-6: #86868b;
+  --ds-chart-grid: #2c2c2e;
+  --ds-chart-axis: #a1a1a6;
+}
+
+html {
+  font-size: 16px;
+  min-width: 1920px;
+}
+
+@media (min-width: 2560px) {
+  :root {
+    --ds-font-meta: 14px;
+    --ds-font-label: 16px;
+    --ds-font-body: 18px;
+    --ds-font-title-sm: 20px;
+    --ds-font-title: 26px;
+    --ds-font-title-lg: 32px;
+    --ds-font-display: 36px;
+  }
+}
+
+@media (min-width: 3840px) {
+  :root {
+    --ds-font-meta: 16px;
+    --ds-font-label: 18px;
+    --ds-font-body: 20px;
+    --ds-font-title-sm: 24px;
+    --ds-font-title: 32px;
+    --ds-font-title-lg: 40px;
+    --ds-font-display: 48px;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  min-width: 1920px;
+  min-height: 100%;
+}
+
+body {
+  background: var(--ds-canvas);
+  color: var(--ds-text);
+  font-family: var(--ds-font-sans);
+  font-size: var(--ds-font-body);
+  font-synthesis: none;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  word-break: keep-all;
+  line-break: strict;
+}
+
+::selection {
+  background: var(--ds-selection-bg);
+  color: var(--ds-selection-fg);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+a {
+  color: var(--ds-link);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--ds-link-hover);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--ds-focus);
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+dt,
+dd {
+  margin: 0;
+}
+
+.ds-dl {
+  display: grid;
+}
+
+.ds-dl > div {
+  align-items: baseline;
+  border-bottom: 1px solid var(--ds-border-subtle);
+  column-gap: var(--ds-space-4);
+  display: grid;
+  grid-template-columns: 128px minmax(0, 1fr);
+  min-height: 44px;
+  padding: 14px 0;
+}
+
+.ds-dl > div:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.ds-dl > div:first-child {
+  padding-top: 0;
+}
+
+.ds-dl dt {
+  color: var(--ds-text-secondary);
+  font-size: var(--ds-font-label);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.ds-dl dd {
+  color: var(--ds-text);
+  font-size: var(--ds-font-body);
+  font-weight: 400;
+  line-height: 1.5;
+  min-width: 0;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.mono {
+  font-family: var(--ds-font-mono);
+}
+
+.ds-display {
+  color: var(--ds-text);
+  font-size: var(--ds-font-display);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+}
+
+.ds-title-lg {
+  color: var(--ds-text);
+  font-size: var(--ds-font-title-lg);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+.ds-title {
+  color: var(--ds-text);
+  font-size: var(--ds-font-title);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.ds-title-sm {
+  color: var(--ds-text);
+  font-size: var(--ds-font-title-sm);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.ds-body {
+  color: var(--ds-text);
+  font-size: var(--ds-font-body);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.ds-body-strong {
+  color: var(--ds-text);
+  font-size: var(--ds-font-body);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.ds-label {
+  color: var(--ds-text);
+  font-size: var(--ds-font-label);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.ds-meta {
+  color: var(--ds-text-secondary);
+  font-size: var(--ds-font-meta);
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.skip-link {
+  background: var(--ds-surface-raised);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-text);
+  font-size: var(--ds-font-label);
+  font-weight: 600;
+  left: var(--ds-space-4);
+  padding: var(--ds-space-3) var(--ds-space-4);
+  position: absolute;
+  top: -6rem;
+  z-index: 80;
+}
+
+.skip-link:focus {
+  top: var(--ds-space-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
