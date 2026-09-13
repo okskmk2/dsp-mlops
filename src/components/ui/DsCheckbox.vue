@@ -21,9 +21,9 @@ defineEmits(['update:modelValue'])
       @change="$emit('update:modelValue', $event.target.checked)"
     />
     <span class="box" :class="{ 'is-on': modelValue }">
-      <DsIcon v-if="modelValue" :is="Check" :size="20" />
+      <DsIcon v-if="modelValue" :is="Check" :size="14" />
     </span>
-    <span class="ds-body">{{ label }}<slot /></span>
+    <span class="check-label">{{ label }}<slot /></span>
   </label>
 </template>
 
@@ -33,7 +33,7 @@ defineEmits(['update:modelValue'])
   cursor: pointer;
   display: inline-flex;
   gap: var(--ds-space-2);
-  min-height: 2.4444rem;
+  min-height: 36px;
 }
 
 .sr {
@@ -50,14 +50,20 @@ defineEmits(['update:modelValue'])
   border-radius: var(--ds-radius-sm);
   color: var(--ds-on-primary);
   display: inline-flex;
-  height: 1.1111rem;
+  height: 18px;
   justify-content: center;
-  width: 1.1111rem;
+  width: 18px;
 }
 
 .box.is-on {
   background: var(--ds-primary);
   border-color: var(--ds-primary);
+}
+
+.check-label {
+  font-size: var(--ds-font-label);
+  font-weight: 400;
+  line-height: 1.3;
 }
 
 .is-disabled {

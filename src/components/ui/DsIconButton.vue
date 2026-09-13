@@ -10,7 +10,7 @@ defineProps({
 
 <template>
   <button class="ds-icon-btn" type="button" :aria-label="label" :disabled="disabled">
-    <DsIcon :is="icon" :size="24" />
+    <DsIcon :is="icon" :size="18" />
   </button>
 </template>
 
@@ -22,10 +22,10 @@ defineProps({
   border-radius: var(--ds-radius-md);
   color: var(--ds-text);
   display: inline-flex;
-  height: 2.4444rem;
+  height: 36px;
   justify-content: center;
   transition: background-color var(--ds-duration) var(--ds-easing);
-  width: 2.4444rem;
+  width: 36px;
 }
 
 .ds-icon-btn:hover {

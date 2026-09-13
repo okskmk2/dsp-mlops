@@ -28,6 +28,7 @@ defineEmits(['update:modelValue'])
 .ds-tabs {
   border-bottom: 1px solid var(--ds-border-subtle);
   display: flex;
+  flex-wrap: wrap;
   gap: var(--ds-space-2);
 }
 
@@ -36,7 +37,7 @@ defineEmits(['update:modelValue'])
   color: var(--ds-text-secondary);
   font-size: var(--ds-font-label);
   font-weight: 600;
-  height: 2.4444rem;
+  height: 36px;
   padding: 0 var(--ds-space-3);
 }
 

@@ -1,9 +1,11 @@
 <script setup>
+import { FilePen, Swords, Trophy } from '@lucide/vue'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import DsButton from '../components/ui/DsButton.vue'
 import DsCard from '../components/ui/DsCard.vue'
 import DsChip from '../components/ui/DsChip.vue'
+import DsIcon from '../components/ui/DsIcon.vue'
 import DsPageHeader from '../components/ui/DsPageHeader.vue'
 import DsSelect from '../components/ui/DsSelect.vue'
 import DsTable from '../components/ui/DsTable.vue'
@@ -32,7 +34,11 @@ const columns = [
   { key: 'costOptional', label: '월 비용', numeric: true },
 ]
 
-const lanes = ['draft', 'challenger', 'champion']
+const lanes = [
+  { id: 'draft', icon: FilePen },
+  { id: 'challenger', icon: Swords },
+  { id: 'champion', icon: Trophy },
+]
 </script>
 
 <template>
@@ -40,7 +46,7 @@ const lanes = ['draft', 'challenger', 'champion']
     <template #actions>
       <DsSelect
         v-model="stage"
-        :options="lanes.map((s) => ({ value: s, label: modelStage[s] }))"
+        :options="lanes.map((s) => ({ value: s.id, label: modelStage[s.id] }))"
         placeholder="스테이지 전체"
         width="sm"
       />
@@ -50,10 +56,15 @@ const lanes = ['draft', 'challenger', 'champion']
   </DsPageHeader>
 
   <div v-if="view === 'kanban'" class="kanban">
-    <DsCard v-for="lane in lanes" :key="lane" padding>
-      <template #title>{{ modelStage[lane] }}</template>
+    <DsCard v-for="lane in lanes" :key="lane.id" padding>
+      <template #title>
+        <span class="lane-title">
+          <DsIcon :is="lane.icon" :size="18" />
+          {{ modelStage[lane.id] }}
+        </span>
+      </template>
       <ul>
-        <li v-for="m in models.filter((x) => x.stage === lane)" :key="m.id">
+        <li v-for="m in models.filter((x) => x.stage === lane.id)" :key="m.id">
           <button type="button" class="card-btn" @click="router.push(`/models/${m.id}`)">
             <span class="ds-body-strong">{{ m.name }} {{ m.version }}</span>
             <span class="ds-meta">{{ dsp.projectById(m.projectId)?.name }}</span>
@@ -77,9 +88,15 @@ const lanes = ['draft', 'challenger', 'champion']
 </template>
 
 <style scoped>
+.lane-title {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--ds-space-2);
+}
+
 .kanban {
   display: grid;
-  gap: var(--ds-space-6);
+  gap: var(--ds-section-gap);
   grid-template-columns: repeat(3, 1fr);
 }
 

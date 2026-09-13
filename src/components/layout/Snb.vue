@@ -3,6 +3,8 @@ import {
   Activity,
   Boxes,
   CircleDollarSign,
+  CircleHelp,
+  ClipboardList,
   FolderKanban,
   GitBranch,
   House,
@@ -71,6 +73,24 @@ const items = [
       { id: 'contamination', label: '오염 구간', route: '/lineage/contamination' },
     ],
   },
+  {
+    id: 'support',
+    label: '지원·지식',
+    icon: CircleHelp,
+    children: [
+      { id: 'guides', label: '사용법', route: '/support/guides' },
+      { id: 'notices', label: '공지사항', route: '/support/notices' },
+    ],
+  },
+  {
+    id: 'requests',
+    label: '분석요청',
+    icon: ClipboardList,
+    children: [
+      { id: 'requestList', label: '목록', route: '/requests' },
+      { id: 'requestCreate', label: '요청하기', route: '/requests/new' },
+    ],
+  },
 ]
 
 const adminItem = {
@@ -90,7 +110,8 @@ function isActive(path) {
   if (path === '/models') return route.path === '/models'
   if (path === '/monitoring') return route.path === '/monitoring'
   if (path === '/cost') return route.path === '/cost'
-  if (path === '/lineage') return route.path === '/lineage'
+  if (path === '/lineage') return route.path === '/lineage' || route.path.startsWith('/lineage/nodes/')
+  if (path === '/requests') return route.path === '/requests' || (route.path.startsWith('/requests/') && route.path !== '/requests/new')
   return route.path === path || route.path.startsWith(`${path}/`)
 }
 </script>
@@ -105,11 +126,11 @@ function isActive(path) {
           :class="{ 'is-active': isActive(item.route) }"
           :to="item.route"
         >
-          <DsIcon :is="item.icon" :size="20" />
+          <DsIcon :is="item.icon" :size="18" />
           <span>{{ item.label }}</span>
         </RouterLink>
         <p v-else class="group-label">
-          <DsIcon :is="item.icon" :size="20" />
+          <DsIcon :is="item.icon" :size="18" />
           {{ item.label }}
         </p>
         <RouterLink
@@ -125,7 +146,7 @@ function isActive(path) {
     </div>
     <div v-if="isAdmin" class="snb-admin">
       <p class="group-label">
-        <DsIcon :is="adminItem.icon" :size="20" />
+        <DsIcon :is="adminItem.icon" :size="18" />
         {{ adminItem.label }}
       </p>
       <RouterLink
@@ -149,7 +170,7 @@ function isActive(path) {
   flex-direction: column;
   height: calc(100vh - var(--ds-gnb-h));
   overflow: auto;
-  padding: var(--ds-space-4) var(--ds-space-3);
+  padding: var(--ds-space-3) var(--ds-space-3);
   position: sticky;
   top: var(--ds-gnb-h);
 }
@@ -161,12 +182,12 @@ function isActive(path) {
 }
 
 .group + .group {
-  margin-top: var(--ds-space-4);
+  margin-top: var(--ds-space-3);
 }
 
 .snb-admin {
   border-top: 1px solid var(--ds-border);
-  margin-top: var(--ds-space-6);
+  margin-top: var(--ds-space-4);
   padding-top: var(--ds-space-3);
 }
 
@@ -176,7 +197,7 @@ function isActive(path) {
   display: flex;
   font-size: var(--ds-font-meta);
   gap: var(--ds-space-2);
-  padding: var(--ds-space-4) var(--ds-space-3) var(--ds-space-2);
+  padding: var(--ds-space-3) var(--ds-space-2) var(--ds-space-2);
 }
 
 .item {
@@ -187,7 +208,7 @@ function isActive(path) {
   font-size: var(--ds-font-label);
   font-weight: 600;
   gap: var(--ds-space-2);
-  min-height: 2.4444rem;
+  min-height: 36px;
   padding: 0 var(--ds-space-3);
   position: relative;
 }
@@ -199,7 +220,7 @@ function isActive(path) {
 
 .item.is-child {
   font-weight: 400;
-  padding-left: 2.2222rem;
+  padding-left: 32px;
 }
 
 .item.is-active {

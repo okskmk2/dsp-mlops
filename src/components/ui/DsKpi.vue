@@ -22,9 +22,9 @@ defineProps({
   border-radius: var(--ds-radius-lg);
   display: flex;
   flex-direction: column;
-  gap: var(--ds-space-2);
-  min-width: 20rem;
-  padding: var(--ds-space-6);
+  gap: var(--ds-space-1);
+  min-width: 0;
+  padding: var(--ds-space-5);
 }
 
 .is-alert {

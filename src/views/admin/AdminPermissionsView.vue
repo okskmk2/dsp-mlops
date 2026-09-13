@@ -35,6 +35,10 @@ const platformMatrix = [
   { id: 'settings', action: 'DSP 설정·사용자·코드', dsp_admin: true, officer: false, general: false },
   { id: 'retry', action: '프로비저닝 재시도', dsp_admin: true, officer: false, general: false },
   { id: 'orgCost', action: '전사 비용 대시보드', dsp_admin: true, officer: true, general: false },
+  { id: 'support', action: '사용법·공지 작성', dsp_admin: true, officer: false, general: false },
+  { id: 'requestCreate', action: '분석요청 제출', dsp_admin: true, officer: true, general: true },
+  { id: 'requestAll', action: '분석요청 전체 조회', dsp_admin: true, officer: true, general: false },
+  { id: 'requestTriage', action: '분석요청 배정·반려', dsp_admin: true, officer: false, general: false },
 ]
 
 const projectMatrix = [
@@ -49,6 +53,7 @@ const projectMatrix = [
   { id: 'retrain', action: '재학습 요청', owner: true, coordinator: true, member: true, viewer: false },
   { id: 'promote', action: '승격·강등 상신', owner: true, coordinator: true, member: false, viewer: false },
   { id: 'contam', action: '오염 선언', owner: true, coordinator: true, member: true, viewer: false },
+  { id: 'compute', action: '컴퓨팅 상향 신청', owner: true, coordinator: true, member: true, viewer: false },
 ]
 
 function mark(on) {
@@ -178,6 +183,6 @@ function saveLine() {
 .stack {
   display: flex;
   flex-direction: column;
-  gap: var(--ds-space-7);
+  gap: var(--ds-section-gap);
 }
 </style>

@@ -28,7 +28,7 @@ defineEmits(['update:modelValue'])
         {{ opt.label }}
       </option>
     </select>
-    <DsIcon class="chev" :is="ChevronDown" :size="20" />
+    <DsIcon class="chev" :is="ChevronDown" :size="18" />
   </span>
 </template>
 
@@ -36,15 +36,15 @@ defineEmits(['update:modelValue'])
 .ds-select-wrap {
   display: inline-block;
   position: relative;
-  width: 15.5556rem;
+  width: 248px;
 }
 
 .ds-select-wrap.is-sm {
-  width: 8.8889rem;
+  width: 144px;
 }
 
 .ds-select-wrap.is-lg {
-  width: 23.3333rem;
+  width: 372px;
 }
 
 .ds-select-wrap.is-full {
@@ -57,9 +57,9 @@ defineEmits(['update:modelValue'])
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-md);
   color: var(--ds-text);
-  font-size: var(--ds-font-body);
+  font-size: var(--ds-font-label);
   height: var(--ds-control-h);
-  padding: 0 2.4rem 0 var(--ds-space-4);
+  padding: 0 32px 0 var(--ds-space-3);
   width: 100%;
 }
 
@@ -83,7 +83,7 @@ defineEmits(['update:modelValue'])
   color: var(--ds-text-secondary);
   pointer-events: none;
   position: absolute;
-  right: 0.6667rem;
-  top: 0.6667rem;
+  right: 10px;
+  top: 11px;
 }
 </style>

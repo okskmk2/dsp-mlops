@@ -71,7 +71,8 @@ defineEmits(['row-click'])
   color: var(--ds-text-secondary);
   font-size: var(--ds-font-label);
   font-weight: 600;
-  height: 2.6667rem;
+  height: 36px;
+  line-height: 1.35;
   padding: 0 var(--ds-space-4);
   position: sticky;
   text-align: left;
@@ -81,9 +82,11 @@ defineEmits(['row-click'])
 
 .ds-table td {
   border-bottom: 1px solid var(--ds-border-subtle);
-  font-size: var(--ds-font-body);
-  min-height: 2.8889rem;
-  padding: 0.7778rem var(--ds-space-4);
+  font-size: var(--ds-font-label);
+  font-weight: 400;
+  line-height: 1.35;
+  height: 40px;
+  padding: 8px var(--ds-space-4);
   vertical-align: middle;
 }
 

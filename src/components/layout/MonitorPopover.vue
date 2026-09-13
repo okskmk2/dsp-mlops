@@ -48,7 +48,7 @@ function seeAll() {
   position: absolute;
   right: 0;
   top: calc(100% + 4px);
-  width: 22.2222rem;
+  width: 356px;
   z-index: var(--ds-z-popover);
 }
 
@@ -63,7 +63,7 @@ li button {
   border-radius: var(--ds-radius-md);
   display: flex;
   justify-content: space-between;
-  min-height: 2.4444rem;
+  min-height: 36px;
   padding: 0 var(--ds-space-2);
   width: 100%;
 }

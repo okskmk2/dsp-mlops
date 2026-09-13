@@ -69,36 +69,36 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   left: 50%;
-  margin-left: -17.7778rem;
-  max-height: calc(100vh - 4.4444rem);
-  padding: var(--ds-space-7);
+  margin-left: -284px;
+  max-height: calc(100vh - 64px);
+  padding: var(--ds-space-6);
   position: absolute;
-  top: 4.4444rem;
-  width: 35.5556rem;
+  top: 64px;
+  width: 568px;
 }
 
 .ds-modal.is-sm {
-  margin-left: -13.3333rem;
-  width: 26.6667rem;
+  margin-left: -214px;
+  width: 428px;
 }
 
 .ds-modal.is-lg {
-  margin-left: -24.4444rem;
-  width: 48.8889rem;
+  margin-left: -392px;
+  width: 784px;
 }
 
 .ds-modal-head {
   align-items: center;
   display: flex;
   justify-content: space-between;
-  margin-bottom: var(--ds-space-6);
+  margin-bottom: var(--ds-space-5);
 }
 
 .ds-modal-body {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: var(--ds-space-5);
+  gap: var(--ds-space-4);
   overflow: auto;
 }
 
@@ -106,6 +106,6 @@ onUnmounted(() => {
   display: flex;
   gap: var(--ds-space-2);
   justify-content: flex-end;
-  margin-top: var(--ds-space-6);
+  margin-top: var(--ds-space-5);
 }
 </style>

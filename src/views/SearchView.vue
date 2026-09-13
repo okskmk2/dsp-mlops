@@ -21,12 +21,15 @@ watch(q, () => {
 function open(kind, row) {
   if (kind === 'project') router.push(row.status === 'draft' ? { path: '/projects/new', query: { draft: row.id } } : `/projects/${row.id}`)
   if (kind === 'model') router.push(`/models/${row.id}`)
-  if (kind === 'approval') router.push('/approvals')
+  if (kind === 'approval') router.push(`/approvals/${row.id}`)
+  if (kind === 'guide') router.push(`/support/guides/${row.id}`)
+  if (kind === 'notice') router.push(`/support/notices/${row.id}`)
+  if (kind === 'analysisRequest') router.push(`/requests/${row.id}`)
 }
 </script>
 
 <template>
-  <DsPageHeader :title="q ? `검색 · ${q}` : '검색'" description="프로젝트, 모델, 데이터셋, 결재를 권한 범위 안에서 찾습니다." />
+  <DsPageHeader :title="q ? `검색 · ${q}` : '검색'" description="프로젝트, 모델, 데이터셋, 결재, 지원 글을 권한 범위 안에서 찾습니다." />
   <DsTabs
     v-model="tab"
     :tabs="[
@@ -34,6 +37,9 @@ function open(kind, row) {
       { id: 'model', label: `모델 ${result.model.length}` },
       { id: 'dataset', label: `데이터셋 ${result.dataset.length}` },
       { id: 'approval', label: `결재 ${result.approval.length}` },
+      { id: 'guide', label: `사용법 ${result.guide.length}` },
+      { id: 'notice', label: `공지 ${result.notice.length}` },
+      { id: 'analysisRequest', label: `분석요청 ${result.analysisRequest.length}` },
     ]"
   />
   <ul class="list">
@@ -61,11 +67,35 @@ function open(kind, row) {
         </div>
       </li>
     </template>
-    <template v-else>
+    <template v-else-if="tab === 'approval'">
       <li v-for="a in result.approval" :key="a.id">
         <button type="button" @click="open('approval', a)">
           <span class="ds-body-strong">{{ approvalType[a.type] }}</span>
           <span class="ds-meta">{{ a.id }} · {{ a.status }}</span>
+        </button>
+      </li>
+    </template>
+    <template v-else-if="tab === 'guide'">
+      <li v-for="g in result.guide" :key="g.id">
+        <button type="button" @click="open('guide', g)">
+          <span class="ds-body-strong">{{ g.title }}</span>
+          <span class="ds-meta">사용법</span>
+        </button>
+      </li>
+    </template>
+    <template v-else-if="tab === 'notice'">
+      <li v-for="n in result.notice" :key="n.id">
+        <button type="button" @click="open('notice', n)">
+          <span class="ds-body-strong">{{ n.title }}</span>
+          <span class="ds-meta">공지</span>
+        </button>
+      </li>
+    </template>
+    <template v-else>
+      <li v-for="r in result.analysisRequest" :key="r.id">
+        <button type="button" @click="open('analysisRequest', r)">
+          <span class="ds-body-strong">{{ r.title }}</span>
+          <span class="ds-meta">분석요청</span>
         </button>
       </li>
     </template>
@@ -86,7 +116,7 @@ function open(kind, row) {
   display: flex;
   flex-direction: column;
   gap: var(--ds-space-1);
-  min-height: 2.8889rem;
+  min-height: 40px;
   padding: var(--ds-space-3) 0;
   text-align: left;
   width: 100%;

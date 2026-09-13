@@ -23,7 +23,7 @@ defineProps({
   flex-direction: column;
   gap: var(--ds-space-2);
   justify-content: center;
-  padding: var(--ds-space-10) var(--ds-space-6);
+  padding: var(--ds-space-7) var(--ds-space-5);
   text-align: center;
 }
 

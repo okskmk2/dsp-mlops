@@ -38,7 +38,7 @@ const bind = computed(() => {
   >
     <template v-if="loading">처리 중</template>
     <template v-else>
-      <DsIcon v-if="icon" :is="icon" :size="20" />
+      <DsIcon v-if="icon" :is="icon" :size="18" />
       <slot />
     </template>
   </component>
@@ -47,17 +47,20 @@ const bind = computed(() => {
 <style scoped>
 .ds-btn {
   align-items: center;
+  align-self: flex-start;
   border-radius: var(--ds-radius-md);
   border-style: solid;
   border-width: 1px;
   display: inline-flex;
+  flex: none;
   font-size: var(--ds-font-label);
   font-weight: 600;
   gap: var(--ds-space-2);
   justify-content: center;
-  line-height: 1.4;
+  line-height: 1.35;
   min-height: var(--ds-control-h);
   padding: 0 var(--ds-space-4);
+  width: auto;
   transition:
     background-color var(--ds-duration) var(--ds-easing),
     border-color var(--ds-duration) var(--ds-easing),
@@ -67,7 +70,7 @@ const bind = computed(() => {
 
 .ds-btn.is-sm {
   min-height: var(--ds-control-h-sm);
-  padding: 0 var(--ds-space-3);
+  padding: 0 var(--ds-space-2);
 }
 
 .ds-btn.is-lg {

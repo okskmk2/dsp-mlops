@@ -55,7 +55,9 @@ function save() {
       <template #title>알림</template>
       <DsCheckbox v-model="form.notifyInapp" label="앱 알림" />
       <DsCheckbox v-model="form.notifyEmail" label="이메일 (선택)" />
-      <DsButton variant="primary" @click="save">저장</DsButton>
+      <div class="ds-actions">
+        <DsButton variant="primary" @click="save">저장</DsButton>
+      </div>
     </DsCard>
 
     <DsCard>
@@ -78,6 +80,7 @@ function save() {
 .stack {
   display: flex;
   flex-direction: column;
-  gap: var(--ds-space-7);
+  gap: var(--ds-section-gap);
+  max-width: 640px;
 }
 </style>

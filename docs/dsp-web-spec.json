@@ -3,7 +3,7 @@
     "name": "DS Platform",
     "shortName": "DSP",
     "type": "internal_mlops_web_application",
-    "purpose": "ML 관리자가 Azure ML 및 Azure Databricks ML 자산의 활용·비용·품질·스테이지·리니지를 운영하기 위한 관제·거버넌스 사이트. 학습/전처리/노트북/Job 설계는 AML·Databricks에서 수행하고 DSP는 신청·결재·프로비저닝·모니터·승격·재학습 요청·감사를 담당한다.",
+    "purpose": "ML 관리자가 Azure ML 및 Azure Databricks ML 자산의 활용·비용·품질·스테이지·리니지를 운영하기 위한 관제·거버넌스 사이트. 학습/전처리/노트북/Job 설계는 AML·Databricks에서 수행하고 DSP는 신청·결재·프로비저닝·컴퓨팅 상향·모니터·승격·재학습 요청·감사를 담당한다.",
     "nonGoals": [
       "Azure ML Studio / Databricks Workspace IDE 복제",
       "노트북 편집, 클러스터 설계 UI, 파이프라인 캔버스, Alert 룰 엔진을 Databricks/AML과 이중 구현",
@@ -12,7 +12,7 @@
     "locale": "ko-KR",
     "designConstraints": {
       "gnbSearch": true,
-      "sidebarTopLevelMax": 6,
+      "sidebarTopLevelMax": 8,
       "primaryUser": "ML_manager_and_project_owner",
       "deepLinkToCloud": true,
       "designSystemRef": "./design-system.json"
@@ -45,12 +45,12 @@
       {
         "id": "coordinator",
         "name": "코디네이터",
-        "description": "운영 실무. 프로젝트원/뷰어 멤버 관리, 기준치, 재학습, 승격/강등 상신. 오너·코디네이터 지정/해제는 불가."
+        "description": "운영 실무. 프로젝트원/뷰어 멤버 관리, 기준치, 재학습, 승격/강등 상신, 컴퓨팅 상향 신청. 오너·코디네이터 지정/해제는 불가."
       },
       {
         "id": "member",
         "name": "프로젝트원",
-        "description": "ML 개발자. Draft 작업(클라우드), 재학습 요청, 오염 선언, Challenger 등록 요청."
+        "description": "ML 개발자. Draft 작업(클라우드), 재학습 요청, 오염 선언, Challenger 등록 요청, 컴퓨팅 상향 신청."
       },
       {
         "id": "viewer",
@@ -62,7 +62,7 @@
       {
         "id": "approver",
         "name": "전자결재 승인권자",
-        "description": "프로젝트 역할과 별도. 생성·예산변경·종료·Champion 승격 등 품의 승인/반려."
+        "description": "프로젝트 역할과 별도. 생성·예산변경·종료·Champion 승격·컴퓨팅 상향 등 품의 승인/반려. 컴퓨팅 상향 품의의 결제자."
       }
     ]
   },
@@ -73,7 +73,11 @@
       "listMemberProjectsOnly": ["general"],
       "manageDspSettings": ["dsp_admin"],
       "retryProvisioning": ["dsp_admin"],
-      "orgCostDashboard": ["dsp_admin", "officer"]
+      "orgCostDashboard": ["dsp_admin", "officer"],
+      "manageSupportContent": ["dsp_admin"],
+      "createAnalysisRequest": ["dsp_admin", "officer", "general"],
+      "viewAllAnalysisRequests": ["dsp_admin", "officer"],
+      "triageAnalysisRequest": ["dsp_admin"]
     },
     "project": {
       "view": ["owner", "coordinator", "member", "viewer", "officer_unscoped_read", "dsp_admin"],
@@ -90,6 +94,7 @@
       "submitPromotion": ["owner", "coordinator"],
       "submitDemotion": ["owner", "coordinator"],
       "declareContamination": ["owner", "coordinator", "member"],
+      "requestComputeUpgrade": ["owner", "coordinator", "member"],
       "approveReject": ["approver"]
     }
   },
@@ -98,8 +103,8 @@
       "left": { "type": "brand", "label": "DS Platform", "link": "/home" },
       "center": {
         "type": "globalSearch",
-        "placeholder": "프로젝트, 모델, 데이터셋, 결재 검색",
-        "scopes": ["project", "model", "dataset", "approval"],
+        "placeholder": "프로젝트, 모델, 데이터셋, 결재, 지원 검색",
+        "scopes": ["project", "model", "dataset", "approval", "guide", "notice", "analysisRequest"],
         "respectsPlatformScope": true
       },
       "right": [
@@ -159,6 +164,24 @@
           ]
         },
         {
+          "id": "support",
+          "label": "지원·지식",
+          "route": "/support/guides",
+          "children": [
+            { "id": "guides", "label": "사용법", "route": "/support/guides" },
+            { "id": "notices", "label": "공지사항", "route": "/support/notices" }
+          ]
+        },
+        {
+          "id": "analysisRequests",
+          "label": "분석요청",
+          "route": "/requests",
+          "children": [
+            { "id": "requestList", "label": "목록", "route": "/requests" },
+            { "id": "requestCreate", "label": "요청하기", "route": "/requests/new" }
+          ]
+        },
+        {
           "id": "admin",
           "label": "관리자",
           "route": "/admin/users",
@@ -187,14 +210,22 @@
     "modelStage": ["draft", "challenger", "champion"],
     "championHealth": ["healthy", "at_risk", "disqualified_pending"],
     "monitorResult": ["pass", "fail", "no_data"],
-    "approvalType": ["project_create", "budget_change", "deadline_change", "project_close", "champion_promote", "champion_demote", "member_sensitive"],
+    "approvalType": ["project_create", "budget_change", "deadline_change", "project_close", "champion_promote", "champion_demote", "member_sensitive", "compute_upgrade"],
+    "provisionKind": ["workspace", "compute_upgrade"],
+    "computeClass": ["aml_cpu_s", "aml_gpu_s", "aml_gpu_m", "adb_jobs_s", "adb_gpu"],
     "approvalStatus": ["pending", "approved", "rejected"],
-    "notificationType": ["approval_done", "provision_done", "provision_failed", "monitor_fail", "drift_alert", "budget_80", "budget_100", "champion_at_risk"]
+    "notificationType": ["approval_done", "provision_done", "provision_failed", "monitor_fail", "drift_alert", "budget_80", "budget_100", "champion_at_risk", "model_stage_change", "notice_published", "analysis_request_submitted", "analysis_request_updated"],
+    "supportBoard": ["guide", "notice"],
+    "postStatus": ["draft", "published"],
+    "guideCategory": ["getting_started", "project", "model", "monitoring", "approval", "cost", "lineage", "faq"],
+    "noticeSeverity": ["info", "warning", "important"],
+    "analysisRequestStatus": ["draft", "submitted", "reviewing", "linked_existing", "new_project", "rejected", "completed"],
+    "fulfillmentIntent": ["existing_project", "new_project", "undecided"]
   },
   "statusSeparation": {
     "rule": "Project.status와 ProvisionRequest.status는 서로 다른 상태 기계다. 한쪽이 다른 쪽을 바꾸지 않는다.",
     "project": "관리 개념. 신청·결재·운영·종료.",
-    "provision": "부가 작업. 승인된 프로젝트에 붙는 클라우드 리소스 생성 건. 리소스 탭·개요 타임라인·관리자 재시도에서만 다룬다."
+    "provision": "부가 작업. 승인된 프로젝트에 붙는 클라우드 리소스 생성·컴퓨팅 등급 변경 건. 리소스 탭·개요 타임라인·관리자 재시도에서만 다룬다."
   },
   "projectStatusModel": {
     "field": "Project.status",
@@ -205,7 +236,7 @@
       "상태는 아래 transitions에 있는 경로로만 변경한다.",
       "생성 결재 승인 시 즉시 active. 프로비저닝 완료를 기다리지 않는다.",
       "종료 결재 대기 중에도 프로젝트 상태는 active. 종료 진행은 Approval(type=project_close, status=pending)과 개요 배너로만 표시한다.",
-      "예산·기한 변경 결재는 상태를 바꾸지 않는다.",
+      "예산·기한 변경·컴퓨팅 상향 결재는 상태를 바꾸지 않는다.",
       "closed는 단말. v1 재개 없음.",
       "draft 폐기는 closed가 아니라 레코드 삭제다."
     ],
@@ -224,7 +255,7 @@
           "discardDraft": ["owner"],
           "view": ["owner"]
         },
-        "forbidden": ["openCloudDeepLink", "manageMembersLimited", "setMonitorThresholds", "requestRetrain", "submitPromotion", "submitClose"]
+        "forbidden": ["openCloudDeepLink", "manageMembersLimited", "setMonitorThresholds", "requestRetrain", "submitPromotion", "submitClose", "requestComputeUpgrade"]
       },
       {
         "id": "pending_approval",
@@ -237,12 +268,12 @@
           "view": ["owner", "approver", "dsp_admin"],
           "approveRejectCreate": ["approver"]
         },
-        "forbidden": ["editCreateForm", "submitCreateApproval", "openCloudDeepLink", "manageMembersLimited", "submitClose"]
+        "forbidden": ["editCreateForm", "submitCreateApproval", "openCloudDeepLink", "manageMembersLimited", "submitClose", "requestComputeUpgrade"]
       },
       {
         "id": "active",
         "label": "운영중",
-        "description": "생성 결재가 승인된 관리 상태. 팀·예산·모니터·승격·재학습·종료 상신이 가능하다. 클라우드 리소스 준비 여부와 무관하다.",
+        "description": "생성 결재가 승인된 관리 상태. 팀·예산·모니터·승격·재학습·컴퓨팅 상향·종료 상신이 가능하다. 클라우드 리소스 준비 여부와 무관하다.",
         "chip": "success",
         "terminal": false,
         "listDefault": true,
@@ -258,10 +289,11 @@
           "registerChallenger": ["owner", "coordinator", "member"],
           "submitPromotion": ["owner", "coordinator"],
           "submitDemotion": ["owner", "coordinator"],
-          "declareContamination": ["owner", "coordinator", "member"]
+          "declareContamination": ["owner", "coordinator", "member"],
+          "requestComputeUpgrade": ["owner", "coordinator", "member"]
         },
         "forbidden": ["editCreateForm"],
-        "cloudActionsNote": "딥링크·Job 트리거는 프로젝트 상태가 아니라 해당 플랫폼 ProvisionRequest.status==succeeded 일 때만 활성."
+        "cloudActionsNote": "딥링크·Job 트리거는 프로젝트 상태가 아니라 해당 플랫폼 kind=workspace ProvisionRequest.status==succeeded 일 때만 활성. 컴퓨팅 상향 진행 중에도 기존 딥링크는 유지."
       },
       {
         "id": "closed",
@@ -273,7 +305,7 @@
         "allowed": {
           "view": ["owner", "coordinator", "member", "viewer", "officer_unscoped_read", "dsp_admin"]
         },
-        "forbidden": ["openCloudDeepLink", "editMetaSubmit", "budgetDeadlineSubmit", "closeProjectSubmit", "manageMembersLimited", "setMonitorThresholds", "requestRetrain", "registerChallenger", "submitPromotion", "submitDemotion", "declareContamination"]
+        "forbidden": ["openCloudDeepLink", "editMetaSubmit", "budgetDeadlineSubmit", "closeProjectSubmit", "manageMembersLimited", "setMonitorThresholds", "requestRetrain", "registerChallenger", "submitPromotion", "submitDemotion", "declareContamination", "requestComputeUpgrade"]
       }
     ],
     "transitions": [
@@ -306,7 +338,7 @@
         "sideEffects": [
           "Approval.status=approved",
           "신청자 알림 approval_done",
-          "부가 작업: 체크된 플랫폼마다 ProvisionRequest 생성(queued). 이 sideEffect는 Project.status를 다시 바꾸지 않는다."
+          "부가 작업: 체크된 플랫폼마다 ProvisionRequest kind=workspace 생성(queued, 플랫폼 기본 컴퓨팅 등급). 이 sideEffect는 Project.status를 다시 바꾸지 않는다."
         ]
       },
       {
@@ -315,7 +347,7 @@
         "trigger": "closeApproved",
         "actor": "approver",
         "precondition": "Approval type=project_close 가 approved",
-        "sideEffects": ["쓰기 차단", "신규 프로비저닝·재시도 중단", "클라우드 리소스 회수는 백엔드 정책. UI에서 직접 삭제하지 않음"]
+        "sideEffects": ["쓰기 차단", "신규 프로비저닝·재시도 중단", "대기 중 compute_upgrade 품의 취소", "클라우드 리소스 회수는 백엔드 정책. UI에서 직접 삭제하지 않음"]
       }
     ],
     "labels": {
@@ -331,10 +363,13 @@
     "entity": "ProvisionRequest",
     "sourceOfTruth": "서버가 소유. Project.status에 쓰지 않고 프로젝트 목록의 주 상태 칩으로도 쓰지 않는다.",
     "invariants": [
-      "프로젝트당 플랫폼마다 ProvisionRequest 1건.",
+      "워크스페이스 생성 건(kind=workspace)은 프로젝트당 플랫폼마다 1건.",
+      "컴퓨팅 상향 건(kind=compute_upgrade)은 같은 플랫폼에 여러 건 가능.",
+      "상향은 해당 플랫폼 kind=workspace 가 succeeded 일 때만.",
+      "동일 플랫폼에 pending compute_upgrade 품의 또는 queued|running 상향 건이 있으면 재신청 불가.",
       "이 상태 변화는 Project.status를 변경하지 않는다.",
       "재시도는 failed 항목만, dsp_admin만. 프로젝트 status==closed 이면 재시도 불가.",
-      "딥링크와 Job 트리거는 해당 건 status==succeeded 일 때만."
+      "딥링크와 Job 트리거는 kind=workspace 이고 status==succeeded 일 때만. 상향 진행 중에도 기존 딥링크는 유지."
     ],
     "states": [
       {
@@ -382,21 +417,44 @@
       "failed": "실패"
     }
   },
+  "computeCatalog": {
+    "note": "DSP가 허용하는 컴퓨팅 등급. 클러스터 설계 UI가 아니다. 생성 시 워크스페이스는 플랫폼별 기본 등급을 받고, 운영 중 상향만 compute_upgrade 품의로 변경한다.",
+    "defaultByPlatform": {
+      "azure_ml": "aml_cpu_s",
+      "azure_databricks": "adb_jobs_s"
+    },
+    "upgradeRule": "동일 플랫폼에서 monthlyCost가 현재보다 큰 등급만 선택 가능. 다운그레이드는 v1 없음.",
+    "classes": [
+      { "id": "aml_cpu_s", "platform": "azure_ml", "label": "CPU Standard", "monthlyCost": 800000, "tier": 1 },
+      { "id": "aml_gpu_s", "platform": "azure_ml", "label": "GPU Standard", "monthlyCost": 3200000, "tier": 2 },
+      { "id": "aml_gpu_m", "platform": "azure_ml", "label": "GPU Memory", "monthlyCost": 6400000, "tier": 3 },
+      { "id": "adb_jobs_s", "platform": "azure_databricks", "label": "Jobs Standard", "monthlyCost": 1200000, "tier": 1 },
+      { "id": "adb_gpu", "platform": "azure_databricks", "label": "GPU Jobs", "monthlyCost": 5000000, "tier": 2 }
+    ]
+  },
   "entities": {
     "Project": {
       "fields": [
         "id", "name", "goal", "background", "techStack[]", "ownerUserId",
         "budgetAmount", "budgetCurrency", "startAt", "endAt",
-        "platforms[]", "status", "approvalId", "createdBy", "createdAt"
+        "platforms[]", "status", "approvalId", "createdBy", "createdAt", "sourceRequestId"
       ],
-      "notes": "status는 projectStatus(관리 수명주기). 프로비저닝 상태는 저장하지 않는다. 부가 상태는 ProvisionRequest.status."
+      "notes": "status는 projectStatus(관리 수명주기). 프로비저닝 상태는 저장하지 않는다. 부가 상태는 ProvisionRequest.status. sourceRequestId는 분석요청에서 이어진 생성 건만."
     },
     "ProjectMember": {
       "fields": ["projectId", "userId", "projectRole", "addedBy", "addedAt"]
     },
+    "ComputeClass": {
+      "fields": ["id", "platform", "label", "monthlyCost", "tier"],
+      "notes": "컴퓨팅 카탈로그 항목. computeCatalog.classes가 소스."
+    },
     "ProvisionRequest": {
-      "fields": ["id", "projectId", "platform", "resourceSpec", "status", "cloudResourceId", "errorMessage"],
-      "notes": "프로젝트에 종속된 부가 작업. status는 provisionItemStatus. Project.status와 동기화하지 않는다."
+      "fields": [
+        "id", "projectId", "platform", "kind", "resourceSpec",
+        "fromSpec", "toSpec", "approvalId", "estimatedMonthlyDelta",
+        "status", "cloudResourceId", "errorMessage"
+      ],
+      "notes": "프로젝트에 종속된 부가 작업. kind=workspace|compute_upgrade. status는 provisionItemStatus. Project.status와 동기화하지 않는다. resourceSpec.computeClass는 현재 적용 등급. 워크스페이스 sku는 티어(standard|premium)이며 컴퓨팅 등급과 별개."
     },
     "ModelAsset": {
       "fields": [
@@ -426,7 +484,27 @@
       "fields": ["id", "modelId", "reason", "datasetRef", "existingJobId", "status", "cloudRunUrl"]
     },
     "Approval": {
-      "fields": ["id", "type", "payloadRef", "requesterId", "approverId", "status", "comment"]
+      "fields": [
+        "id", "type", "payloadRef", "requesterId", "approverId", "status", "comment",
+        "amount", "fromClass", "toClass", "reason", "projectId", "platform", "estimatedMonthlyDelta", "budgetAfter"
+      ],
+      "notes": "type=compute_upgrade 이면 payloadRef는 대상 workspace ProvisionRequest.id. 결제자는 approvalLines에서 type=compute_upgrade 승인권자(비용 품의 라인). 오너 사전 동의 없음."
+    },
+    "SupportPost": {
+      "fields": [
+        "id", "board", "title", "body", "category", "severity", "pinned",
+        "status", "authorId", "publishedAt", "updatedAt", "expiresAt"
+      ],
+      "notes": "board=guide|notice. 사용법과 공지사항은 같은 엔티티, 다른 보드. 본문은 평문. 댓글 없음. 게시는 dsp_admin만."
+    },
+    "AnalysisRequest": {
+      "fields": [
+        "id", "title", "problem", "businessContext", "desiredOutcome", "dataDescription",
+        "dueAt", "relatedProjectId", "fulfillmentIntent", "status",
+        "requesterId", "assigneeId", "linkedProjectId", "rejectReason",
+        "createdAt", "updatedAt"
+      ],
+      "notes": "ML 작업 의뢰 접수. 전자결재가 아니다. 수용 후 기존 프로젝트에 붙이거나 프로젝트 생성 신청으로 이어진다. 생성 결재는 기존 project_create 흐름."
     }
   },
   "pages": [
@@ -442,7 +520,8 @@
         "kpi.overBudgetProjectCount",
         "attentionModels[]",
         "myPendingApprovals[3]",
-        "provisioningInProgress[]"
+        "provisioningInProgress[]",
+        "pinnedNotices[2]"
       ],
       "buttons": [
         { "id": "createProject", "label": "프로젝트 생성", "roles": ["general", "officer", "dsp_admin"], "action": "nav:/projects/new" },
@@ -516,6 +595,7 @@
       "data": ["meta", "status", "approvalHistory[]", "provisionItems[]", "teamCount", "modelCount"],
       "statusBanner": {
         "pending_close": "Project.status==active && open Approval type=project_close",
+        "pending_compute_upgrade": "Project.status==active && open Approval type=compute_upgrade → 리소스 탭 링크. 프로젝트 칩은 그대로 active.",
         "provisionFailed": "any ProvisionRequest.status==failed → dsp_admin retry CTA. 프로젝트 칩은 그대로 active."
       },
       "chips": {
@@ -548,11 +628,32 @@
     {
       "id": "projectResources",
       "route": "/projects/:id/resources",
-      "purpose": "프로비저닝된 AML/ADB 자산 조회 및 딥링크.",
+      "purpose": "프로비저닝된 AML/ADB 자산 조회, 딥링크, 컴퓨팅 상향 신청.",
       "ui": ["resourceCards"],
-      "data": ["platform", "cloudResourceId", "status", "createdAt"],
-      "buttons": [{ "id": "openWorkspace", "label": "워크스페이스 열기" }],
-      "forbidden": ["createClusterUi", "deleteResourceDirect"]
+      "data": ["platform", "kind", "cloudResourceId", "status", "computeClass", "createdAt", "pendingUpgradeApproval", "upgradeHistory[]"],
+      "buttons": [
+        { "id": "openWorkspace", "label": "워크스페이스 열기", "visibleIf": "kind==workspace && status==succeeded" },
+        {
+          "id": "requestComputeUpgrade",
+          "label": "컴퓨팅 상향 신청",
+          "roles": ["owner", "coordinator", "member"],
+          "visibleIf": "kind==workspace && status==succeeded && project.status==active && no in-flight compute_upgrade"
+        }
+      ],
+      "forbidden": ["createClusterUi", "deleteResourceDirect", "computeDowngrade"]
+    },
+    {
+      "id": "computeUpgrade",
+      "route": "/projects/:id/resources/:provisionId/upgrade",
+      "purpose": "준비된 워크스페이스의 컴퓨팅 등급 상향을 결제자에게 상신. 클러스터 설계 없음. 드로어가 아니라 독립 페이지.",
+      "ui": ["pageForm"],
+      "fields": ["platform(read)", "fromClass(read)", "toClass(select catalog higher only)", "reason", "estimatedMonthlyDelta(read)", "remainingBudget(read)"],
+      "buttons": [
+        { "id": "submitComputeUpgrade", "label": "결재 상신" },
+        { "id": "cancel", "label": "취소" }
+      ],
+      "afterSubmit": "create Approval type=compute_upgrade; notify approver; if requester!=owner notify owner; Project.status unchanged",
+      "budgetRule": "승인 시 estimatedMonthlyDelta가 잔여 예산(budgetAmount-actual)을 넘으면 같은 품의에서 budgetAmount를 actual+delta 이상으로 갱신. 별도 budget_change 없음."
     },
     {
       "id": "projectCost",
@@ -594,6 +695,7 @@
         "runDeepLink"
       ],
       "buttons": [
+        { "id": "registerChallenger", "label": "Challenger 등록", "visibleIf": "draft && owner|coordinator|member" },
         { "id": "promote", "label": "승격 요청", "visibleIf": "challenger && owner|coordinator" },
         { "id": "demote", "label": "강등 상신", "visibleIf": "champion && owner|coordinator" },
         { "id": "retrain", "label": "재학습", "opens": "retrainModal", "roles": ["owner", "coordinator", "member"] },
@@ -664,10 +766,17 @@
     {
       "id": "lineageExplore",
       "route": "/lineage",
-      "purpose": "데이터셋-Job-모델-엔드포인트 계보.",
-      "ui": ["graph", "propertyDrawer"],
+      "purpose": "데이터셋-Job-모델-엔드포인트 계보. 노드 선택은 상세 페이지로 이동.",
+      "ui": ["graph"],
       "nodeTypes": ["dataset", "job", "modelVersion", "endpoint"],
-      "buttons": ["search", "depth", "impactAnalysis"]
+      "buttons": ["search"]
+    },
+    {
+      "id": "lineageNode",
+      "route": "/lineage/nodes/:nodeId",
+      "purpose": "리니지 노드 속성·하류 영향. 드로어가 아니라 독립 페이지.",
+      "ui": ["definitionList", "impactList"],
+      "buttons": ["depth", "backToGraph"]
     },
     {
       "id": "contamination",
@@ -680,16 +789,30 @@
     {
       "id": "approvals",
       "route": "/approvals",
-      "purpose": "전자결재 처리.",
-      "ui": ["filterTable", "detailDrawer"],
+      "purpose": "전자결재 목록. 행을 열면 품의 상세 페이지로 이동.",
+      "ui": ["filterTable"],
       "columns": ["type", "requester", "amountOrModel", "due", "status"],
+      "buttons": ["openDetail"]
+    },
+    {
+      "id": "approvalDetail",
+      "route": "/approvals/:id",
+      "purpose": "품의 상세·승인·반려. 드로어가 아니라 독립 페이지.",
+      "ui": ["definitionList", "actionHeader"],
+      "computeUpgradeFields": ["fromClass", "toClass", "estimatedMonthlyDelta", "remainingBudget", "reason"],
       "buttons": ["approve", "rejectWithReason", "openTarget"]
     },
     {
       "id": "notifications",
       "route": "/notifications",
-      "purpose": "운영 이벤트 수신.",
-      "ui": ["timelineList"],
+      "purpose": "운영 이벤트 수신. 유형별 위험도를 칩으로 표시. 모델 스테이지 변경(Draft→Challenger, Challenger→Champion/운영)은 해당 프로젝트 멤버 전원에게 간다.",
+      "ui": ["timelineList", "severityChip"],
+      "data": ["myNotifications[]"],
+      "examples": [
+        "model_stage_change: Draft → Challenger. 스테이징에서 비교 검증을 시작합니다.",
+        "model_stage_change: Challenger → Champion. 운영(prod) 모델로 승격되었습니다.",
+        "model_stage_change: Champion → Challenger. 운영 모델에서 강등되었습니다."
+      ],
       "buttons": ["markRead", "goto"]
     },
     {
@@ -705,7 +828,120 @@
       "route": "/search",
       "purpose": "통합검색.",
       "ui": ["tabbedList"],
-      "tabs": ["project", "model", "dataset", "approval"]
+      "tabs": ["project", "model", "dataset", "approval", "guide", "notice", "analysisRequest"]
+    },
+    {
+      "id": "guideList",
+      "route": "/support/guides",
+      "purpose": "사이트 사용법 게시판. 로그인 사용자는 게시된 글을 읽고, 관리자만 작성·게시한다.",
+      "ui": ["filterBar", "dataTable"],
+      "filters": ["category", "q"],
+      "columns": ["pinned", "title", "category", "updatedAt", "author"],
+      "scopeRule": "published=all logged-in; draft=author|dsp_admin",
+      "buttons": [
+        { "id": "write", "label": "글쓰기", "roles": ["dsp_admin"], "action": "nav:/support/guides/new" },
+        { "id": "rowOpen", "label": "열기", "action": "nav:/support/guides/:id" }
+      ]
+    },
+    {
+      "id": "guideDetail",
+      "route": "/support/guides/:id",
+      "purpose": "사용법 본문.",
+      "ui": ["article"],
+      "buttons": [
+        { "id": "edit", "label": "편집", "roles": ["dsp_admin"] }
+      ]
+    },
+    {
+      "id": "guideEdit",
+      "route": "/support/guides/new|/support/guides/:id/edit",
+      "purpose": "사용법 작성·수정.",
+      "ui": ["pageForm"],
+      "roles": ["dsp_admin"],
+      "fields": ["title", "category", "body", "pinned"],
+      "buttons": [
+        { "id": "saveDraft", "label": "임시저장" },
+        { "id": "publish", "label": "게시" }
+      ]
+    },
+    {
+      "id": "noticeList",
+      "route": "/support/notices",
+      "purpose": "플랫폼 공지 게시판. 점검·정책·운영 안내.",
+      "ui": ["filterBar", "dataTable"],
+      "filters": ["severity", "q"],
+      "columns": ["pinned", "title", "severity", "publishedAt", "author"],
+      "scopeRule": "published=all logged-in; draft=author|dsp_admin",
+      "buttons": [
+        { "id": "write", "label": "글쓰기", "roles": ["dsp_admin"], "action": "nav:/support/notices/new" },
+        { "id": "rowOpen", "label": "열기", "action": "nav:/support/notices/:id" }
+      ]
+    },
+    {
+      "id": "noticeDetail",
+      "route": "/support/notices/:id",
+      "purpose": "공지 본문.",
+      "ui": ["article", "severityChip"],
+      "buttons": [
+        { "id": "edit", "label": "편집", "roles": ["dsp_admin"] }
+      ]
+    },
+    {
+      "id": "noticeEdit",
+      "route": "/support/notices/new|/support/notices/:id/edit",
+      "purpose": "공지 작성·수정. important 게시 시 전 사용자 알림.",
+      "ui": ["pageForm"],
+      "roles": ["dsp_admin"],
+      "fields": ["title", "severity", "body", "pinned", "expiresAt"],
+      "buttons": [
+        { "id": "saveDraft", "label": "임시저장" },
+        { "id": "publish", "label": "게시" }
+      ]
+    },
+    {
+      "id": "analysisRequestList",
+      "route": "/requests",
+      "purpose": "ML 작업 의뢰 목록. 일반은 본인 건, 직책자·관리자는 전체.",
+      "ui": ["filterBar", "dataTable"],
+      "filters": ["status", "intent"],
+      "columns": ["title", "requester", "intent", "relatedProject", "status", "createdAt"],
+      "buttons": [
+        { "id": "create", "label": "요청하기", "action": "nav:/requests/new" },
+        { "id": "rowOpen", "label": "열기", "action": "nav:/requests/:id" }
+      ]
+    },
+    {
+      "id": "analysisRequestCreate",
+      "route": "/requests/new",
+      "purpose": "ML 작업이 필요하다는 의뢰를 올린다. 학습 UI가 아니다.",
+      "ui": ["pageForm"],
+      "fields": [
+        { "name": "title", "required": true },
+        { "name": "problem", "required": true, "ui": "textarea" },
+        { "name": "businessContext", "ui": "textarea" },
+        { "name": "desiredOutcome", "required": true, "ui": "textarea" },
+        { "name": "dataDescription", "ui": "textarea" },
+        { "name": "dueAt" },
+        { "name": "relatedProjectId", "ui": "projectSelect", "note": "기존 프로젝트에 붙일 후보. 필수 아님" },
+        { "name": "fulfillmentIntent", "required": true }
+      ],
+      "buttons": [
+        { "id": "saveDraft", "label": "임시저장" },
+        { "id": "submit", "label": "요청 제출" }
+      ],
+      "afterSubmit": "status=submitted; notify all dsp_admin"
+    },
+    {
+      "id": "analysisRequestDetail",
+      "route": "/requests/:id",
+      "purpose": "의뢰 본문과 수용 경로. 관리자가 기존 프로젝트에 붙이거나 새 프로젝트 생성으로 넘긴다.",
+      "ui": ["definitionList", "actionHeader"],
+      "buttons": [
+        { "id": "linkExisting", "label": "기존 프로젝트에 배정", "roles": ["dsp_admin"], "visibleIf": "status in submitted|reviewing" },
+        { "id": "startNewProject", "label": "새 프로젝트 생성", "roles": ["dsp_admin", "requester"], "visibleIf": "status in submitted|reviewing|draft", "action": "nav:/projects/new?fromRequest=:id" },
+        { "id": "reject", "label": "반려", "roles": ["dsp_admin"] },
+        { "id": "complete", "label": "완료", "roles": ["dsp_admin"], "visibleIf": "status in linked_existing|new_project" }
+      ]
     },
     {
       "id": "settings",
@@ -730,8 +966,15 @@
     {
       "id": "adminCodes",
       "route": "/admin/codes",
-      "purpose": "상태·유형 등 공통 코드 관리.",
-      "ui": ["groupList", "codeTable"],
+      "purpose": "공통 코드 그룹 목록. 왼쪽 패널 없이 그룹을 별도 페이지로 연다.",
+      "ui": ["groupTable"],
+      "roles": ["dsp_admin"]
+    },
+    {
+      "id": "adminCodeGroup",
+      "route": "/admin/codes/:group",
+      "purpose": "한 코드 그룹의 코드 테이블.",
+      "ui": ["codeTable"],
       "roles": ["dsp_admin"]
     }
   ],
@@ -744,9 +987,32 @@
         "approver approves or rejects",
         "on reject: Project.status=draft",
         "on approve: Project.status=active; notify requester",
-        "side job only: create ProvisionRequest per checked platform (does not change Project.status)",
+        "side job only: create ProvisionRequest kind=workspace per checked platform with default compute class (does not change Project.status)",
         "UI 부가 타임라인이 ProvisionRequest.status를 갱신",
         "dsp_admin retryProvisioning: failed items re-queued; Project.status unchanged"
+      ]
+    },
+    {
+      "id": "publishSupportPost",
+      "steps": [
+        "dsp_admin writes SupportPost on board=guide or notice",
+        "saveDraft keeps status=draft; only author and dsp_admin see it",
+        "publish sets status=published, publishedAt if empty",
+        "pinned published notices appear on home (max 2)",
+        "notice severity=important 게시 시 전 사용자 notice_published 알림"
+      ]
+    },
+    {
+      "id": "analysisRequestIntake",
+      "steps": [
+        "any logged-in user submits AnalysisRequest; not an Approval",
+        "notify all dsp_admin type=analysis_request_submitted",
+        "dsp_admin triages: link to existing active project OR start project create OR reject",
+        "link existing: status=linked_existing; linkedProjectId set; requester added as viewer if not already a member; notify requester and project owner",
+        "new project: open /projects/new?fromRequest=:id with title→name, desiredOutcome→goal, problem+businessContext→background; Project.sourceRequestId set",
+        "on project_create submit: request status=new_project, linkedProjectId=project.id",
+        "reject: status=rejected with reason; notify requester",
+        "dsp_admin may mark completed when linked work is done"
       ]
     },
     {
@@ -756,7 +1022,7 @@
         "owner submits Approval project_close; status stays active with pending-close banner",
         "approver approves or rejects",
         "on reject: remain active, banner cleared",
-        "on approve: project.status=closed; writes disabled; no reopen in v1"
+        "on approve: project.status=closed; writes disabled; pending compute_upgrade approvals cancelled; no reopen in v1"
       ]
     },
     {
@@ -765,7 +1031,8 @@
         "challenger compared to current champion",
         "owner or coordinator submits Approval champion_promote",
         "approver decides by checklist (metrics, monitor pass, drift)",
-        "on approve: previous champion demoted to challenger or archived; new champion set"
+        "on approve: previous champion demoted to challenger or archived; new champion set",
+        "each stage change notifies all ProjectMember of that project (type=model_stage_change), including the displaced previous champion"
       ]
     },
     {
@@ -785,11 +1052,32 @@
         "new version lands as draft or challenger per policy",
         "does not auto-replace champion"
       ]
+    },
+    {
+      "id": "registerChallenger",
+      "steps": [
+        "draft model; owner|coordinator|member submits registerChallenger (no e-approval)",
+        "stage becomes challenger",
+        "notify all ProjectMember type=model_stage_change"
+      ]
+    },
+    {
+      "id": "upgradeCompute",
+      "steps": [
+        "precondition: Project.status==active, target platform kind=workspace succeeded, no in-flight compute_upgrade for that platform",
+        "owner|coordinator|member opens /projects/:id/resources/:provisionId/upgrade, picks a higher catalog class + reason",
+        "submit creates Approval type=compute_upgrade; amount=monthlyCost delta; notify payer (approver); notify owner if requester!=owner",
+        "Project.status stays active; resource card shows 상향 결재 대기",
+        "approver approves or rejects (reject reason required)",
+        "on reject: spec unchanged; notify requester",
+        "on approve: if delta > remaining budget, raise Project.budgetAmount to actual+delta in the same 품의; create ProvisionRequest kind=compute_upgrade queued; apply toSpec.computeClass on the workspace item when succeeded; notify requester provision_done",
+        "dsp_admin retryProvisioning for failed upgrade items only; Project.status unchanged"
+      ]
     }
   ],
   "integrations": {
-    "azureMl": ["workspace provision", "model registry read", "endpoint metrics read", "job trigger by id", "cost usage"],
-    "azureDatabricks": ["workspace provision", "mlflow registry read", "job run trigger by id", "system tables cost", "unity catalog lineage read"],
+    "azureMl": ["workspace provision", "compute class apply", "model registry read", "endpoint metrics read", "job trigger by id", "cost usage"],
+    "azureDatabricks": ["workspace provision", "compute class apply", "mlflow registry read", "job run trigger by id", "system tables cost", "unity catalog lineage read"],
     "eApproval": ["submit", "callback approved/rejected"],
     "notify": ["inapp", "optional email"]
   },
@@ -816,16 +1104,45 @@
         "pass": "success",
         "fail": "danger",
         "no_data": "warning"
+      },
+      "notificationSeverity": {
+        "champion_at_risk": "danger",
+        "monitor_fail": "danger",
+        "provision_failed": "danger",
+        "budget_100": "danger",
+        "drift_alert": "warning",
+        "budget_80": "warning",
+        "provision_done": "success",
+        "approval_done": "info",
+        "model_stage_change": "info",
+        "notice_published": "warning",
+        "analysis_request_submitted": "info",
+        "analysis_request_updated": "info"
+      },
+      "analysisRequestStatus": {
+        "draft": "neutral",
+        "submitted": "warning",
+        "reviewing": "info",
+        "linked_existing": "success",
+        "new_project": "success",
+        "rejected": "danger",
+        "completed": "neutral"
+      },
+      "noticeSeverity": {
+        "info": "info",
+        "warning": "warning",
+        "important": "danger"
       }
     },
     "emptyStates": true,
     "deepLinkButtonLabel": "워크스페이스에서 열기"
   },
   "aiImplementationPrompt": {
-    "instruction": "이 JSON을 기능·권한·라우팅의 단일 소스로, docs/design-system.json을 시각 언어의 단일 소스로 사용하여 DSP 웹앱을 구현하라. pages[].route와 layout.snb를 라우팅의 근거로 삼고, permissionMatrix 밖의 쓰기를 만들지 마라. 클라우드 학습 UI를 발명하지 말고 딥링크와 job-id 트리거만 구현하라. 카피는 한국어. UI는 디자인 시스템의 토큰·금지를 따른다(그림자·그라디언트 없음, 본문 16px, 라벨 14px, 메타 12px, 정수 px, 1920 기준, 모바일 분기 없음).",
+    "instruction": "이 JSON을 기능·권한·라우팅의 단일 소스로, docs/design-system.json을 시각 언어의 단일 소스로 사용하여 DSP 웹앱을 구현하라. pages[].route와 layout.snb를 라우팅의 근거로 삼고, permissionMatrix 밖의 쓰기를 만들지 마라. 클라우드 학습 UI를 발명하지 말고 딥링크와 job-id 트리거만 구현하라. 카피는 한국어. UI는 디자인 시스템의 토큰·금지를 따른다(그림자·그라디언트 없음, 본문 문단 16px, UI 라벨·표 14px, 메타 12px, 정수 px, regular 밀도, 1920 설계 원점, 문서 min-width 1920 금지, 모바일 분기 없음).",
     "mustImplementFirst": [
       "auth + platform/project roles",
       "project create + approval (Project.status) and separate provision items",
+      "compute upgrade request (member) + payer approval + catalog class apply",
       "model registry stages",
       "monitor pass/fail + thresholds",
       "cost by project",

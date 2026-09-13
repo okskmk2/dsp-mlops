@@ -14,6 +14,18 @@ export function canSeeOrgCostFull(user) {
   return user?.platformRole === 'dsp_admin' || user?.platformRole === 'officer'
 }
 
+export function canManageSupport(user) {
+  return user?.platformRole === 'dsp_admin'
+}
+
+export function canViewAllAnalysisRequests(user) {
+  return user?.platformRole === 'dsp_admin' || user?.platformRole === 'officer'
+}
+
+export function canTriageAnalysisRequest(user) {
+  return user?.platformRole === 'dsp_admin'
+}
+
 export function isApprover(user) {
   return Boolean(user?.isApprover)
 }
@@ -42,7 +54,12 @@ export function hasProjectRole(user, projectId, members, roles) {
 export function canOpenCloud(user, project, provisions, members) {
   if (!user || !project || project.status !== 'active') return false
   if (!hasProjectRole(user, project.id, members, ['owner', 'coordinator', 'member'])) return false
-  return provisions.some((p) => p.projectId === project.id && p.status === 'succeeded')
+  return provisions.some(
+    (p) =>
+      p.projectId === project.id &&
+      (p.kind || 'workspace') === 'workspace' &&
+      p.status === 'succeeded',
+  )
 }
 
 export function canWriteProject(user, project, members, action) {
@@ -61,6 +78,7 @@ export function canWriteProject(user, project, members, action) {
     submitPromotion: ['owner', 'coordinator'],
     submitDemotion: ['owner', 'coordinator'],
     declareContamination: ['owner', 'coordinator', 'member'],
+    requestComputeUpgrade: ['owner', 'coordinator', 'member'],
   }
   return Boolean(role && (map[action] ?? []).includes(role))
 }

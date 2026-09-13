@@ -9,6 +9,7 @@ import DsPageHeader from '../components/ui/DsPageHeader.vue'
 import DsSelect from '../components/ui/DsSelect.vue'
 import DsTable from '../components/ui/DsTable.vue'
 import { platformType } from '../data/labels'
+import { chartColor } from '../lib/chart'
 import { formatPct, formatWon } from '../lib/format'
 import { canSeeOrgCostFull } from '../lib/permissions'
 import { useAuthStore } from '../stores/auth'
@@ -38,11 +39,11 @@ const rank = computed(() => {
       }))
       .sort((a, b) => b.amount - a.amount)
     const max = items[0]?.amount || 1
-    return items.map((i) => ({
+    return items.map((i, idx) => ({
       ...i,
       pct: Math.round((i.amount / max) * 100),
       valueLabel: formatWon(i.amount),
-      color: 'var(--ds-chart-1)',
+      color: chartColor(idx),
     }))
   }
   for (const r of records.value) map[r.projectId] = (map[r.projectId] || 0) + r.amount
@@ -55,11 +56,11 @@ const rank = computed(() => {
     }))
     .sort((a, b) => b.amount - a.amount)
   const max = items[0]?.amount || 1
-  return items.map((i) => ({
+  return items.map((i, idx) => ({
     ...i,
     pct: Math.round((i.amount / max) * 100),
     valueLabel: formatWon(i.amount),
-    color: i.amount > i.budget ? 'var(--ds-chart-2)' : 'var(--ds-chart-1)',
+    color: i.budget && i.amount > i.budget ? 'var(--ds-danger)' : chartColor(idx),
   }))
 })
 
@@ -114,7 +115,7 @@ const columns = computed(() => [
     </template>
   </DsPageHeader>
 
-  <p v-if="idleHint" class="ds-meta" style="margin-bottom: 16px">
+  <p v-if="idleHint" class="ds-meta ds-mb-section">
     유휴 힌트: {{ idleHint.label }} 실적이 예산의 10% 미만입니다.
   </p>
 
@@ -133,7 +134,7 @@ const columns = computed(() => [
     </DsCard>
   </div>
 
-  <DsCard style="margin-top: 32px">
+  <DsCard class="ds-follow">
     <template #title>예산 대비 실적</template>
     <DsTable
       :columns="columns"
@@ -150,7 +151,7 @@ const columns = computed(() => [
 <style scoped>
 .grid {
   display: grid;
-  gap: var(--ds-space-6);
+  gap: var(--ds-section-gap);
   grid-template-columns: 1.4fr 1fr;
 }
 </style>

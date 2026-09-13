@@ -16,6 +16,7 @@ defineProps({
 
 <style scoped>
 .ds-card {
+  --ds-card-pad: 0px;
   background: var(--ds-surface);
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-lg);
@@ -25,7 +26,20 @@ defineProps({
 }
 
 .is-pad {
-  padding: var(--ds-space-6);
+  --ds-card-pad: var(--ds-space-5);
+  padding: var(--ds-card-pad);
+}
+
+.ds-card :deep(.ds-table-wrap) {
+  border-left: 0;
+  border-radius: 0;
+  border-right: 0;
+  margin-inline: calc(-1 * var(--ds-card-pad));
+}
+
+.ds-card :deep(.ds-table-wrap:last-child) {
+  border-bottom: 0;
+  margin-bottom: calc(-1 * var(--ds-card-pad));
 }
 
 .ds-card-head {
@@ -39,5 +53,10 @@ defineProps({
   align-items: center;
   display: flex;
   gap: var(--ds-space-2);
+}
+
+.ds-card-action :deep(.ds-btn) {
+  min-height: var(--ds-control-h-sm);
+  padding: 0 var(--ds-space-2);
 }
 </style>

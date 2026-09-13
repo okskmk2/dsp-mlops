@@ -42,8 +42,7 @@ function enter(id) {
   display: flex;
   justify-content: center;
   min-height: 100vh;
-  min-width: 1920px;
-  padding: var(--ds-space-8);
+  padding: var(--ds-space-6);
 }
 
 .panel {
@@ -52,9 +51,10 @@ function enter(id) {
   border-radius: var(--ds-radius-lg);
   display: flex;
   flex-direction: column;
-  gap: var(--ds-space-4);
-  padding: var(--ds-space-8);
-  width: 40rem;
+  gap: var(--ds-space-3);
+  max-width: 640px;
+  padding: var(--ds-space-6);
+  width: 100%;
 }
 
 ul {
@@ -70,7 +70,7 @@ li button {
   border-radius: var(--ds-radius-md);
   display: flex;
   gap: var(--ds-space-3);
-  min-height: 3.5556rem;
+  min-height: 44px;
   padding: var(--ds-space-3) var(--ds-space-4);
   text-align: left;
   transition: background-color var(--ds-duration) var(--ds-easing);
@@ -89,9 +89,9 @@ li button:hover {
   color: var(--ds-primary);
   display: inline-flex;
   font-weight: 600;
-  height: 2.4444rem;
+  height: 36px;
   justify-content: center;
-  width: 2.4444rem;
+  width: 36px;
 }
 
 .who {

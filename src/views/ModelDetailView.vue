@@ -41,6 +41,11 @@ const canDemo = computed(
 const canRetrain = computed(() =>
   hasProjectRole(auth.user, model.value?.projectId, dsp.members, ['owner', 'coordinator', 'member']),
 )
+const canRegister = computed(
+  () =>
+    model.value?.stage === 'draft' &&
+    hasProjectRole(auth.user, model.value.projectId, dsp.members, ['owner', 'coordinator', 'member']),
+)
 const lineageNodes = computed(() => {
   if (!model.value) return []
   const edges = dsp.lineageEdges.filter((e) => e.to === model.value.id || e.from === model.value.id)
@@ -54,6 +59,13 @@ const lineageNodes = computed(() => {
       <template #actions>
         <DsButton v-if="canRetrain && project.status === 'active'" variant="secondary" @click="ui.retrainModelId = model.id">
           재학습
+        </DsButton>
+        <DsButton
+          v-if="canRegister && project.status === 'active'"
+          variant="primary"
+          @click="dsp.registerChallenger(model.id)"
+        >
+          Challenger 등록
         </DsButton>
         <DsButton v-if="canPromo" variant="primary" :to="`/models/${model.id}/promote`">승격 요청</DsButton>
         <DsButton v-if="canDemo" variant="danger" @click="dsp.submitDemotion(model.id)">강등 상신</DsButton>
@@ -101,7 +113,7 @@ const lineageNodes = computed(() => {
       </DsCard>
     </div>
 
-    <DsCard style="margin-top: 32px">
+    <DsCard class="ds-follow">
       <template #title>미니 리니지</template>
       <template #action>
         <DsButton variant="ghost" to="/lineage">리니지 확대</DsButton>
@@ -122,12 +134,12 @@ const lineageNodes = computed(() => {
 .chips {
   display: flex;
   gap: var(--ds-space-2);
-  margin-bottom: var(--ds-space-6);
+  margin-bottom: var(--ds-section-gap);
 }
 
 .two {
   display: grid;
-  gap: var(--ds-space-6);
+  gap: var(--ds-section-gap);
   grid-template-columns: 1fr 1fr;
 }
 

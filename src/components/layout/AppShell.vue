@@ -25,15 +25,16 @@ const ui = useUiStore()
 <style scoped>
 .shell {
   display: grid;
-  grid-template-columns: var(--ds-snb-w) minmax(92.2222rem, 1fr);
+  grid-template-columns: var(--ds-snb-w) minmax(0, 1fr);
   grid-template-rows: var(--ds-gnb-h) 1fr;
   min-height: 100vh;
-  min-width: 1920px;
+  width: 100%;
 }
 
 .main {
   background: var(--ds-canvas);
-  min-width: 92.2222rem;
-  padding: var(--ds-space-6) var(--ds-space-7);
+  min-width: 0;
+  overflow-x: auto;
+  padding: var(--ds-page-pad-y) var(--ds-page-pad-x);
 }
 </style>

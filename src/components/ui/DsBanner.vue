@@ -16,7 +16,7 @@ const iconMap = {
 
 <template>
   <div class="ds-banner" :class="`is-${tone}`" role="status">
-    <DsIcon :is="iconMap[tone] || Info" :size="24" />
+    <DsIcon :is="iconMap[tone] || Info" :size="20" />
     <div class="ds-banner-body">
       <slot />
     </div>
@@ -28,12 +28,13 @@ const iconMap = {
 
 <style scoped>
 .ds-banner {
-  align-items: flex-start;
+  align-items: center;
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-md);
   display: flex;
-  font-size: var(--ds-font-body);
+  font-size: var(--ds-font-label);
   gap: var(--ds-space-3);
+  line-height: 1.4;
   padding: var(--ds-space-4);
 }
 
@@ -65,5 +66,10 @@ const iconMap = {
 .ds-banner-action {
   align-items: center;
   display: flex;
+}
+
+.ds-banner-action :deep(.ds-btn) {
+  min-height: var(--ds-control-h-sm);
+  padding: 0 var(--ds-space-2);
 }
 </style>

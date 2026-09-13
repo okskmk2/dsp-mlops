@@ -42,7 +42,7 @@ function active(item) {
   border-bottom: 1px solid var(--ds-border-subtle);
   display: flex;
   gap: var(--ds-space-2);
-  margin-bottom: var(--ds-space-6);
+  margin-bottom: var(--ds-space-5);
 }
 
 .tab {
@@ -50,7 +50,7 @@ function active(item) {
   color: var(--ds-text-secondary);
   font-size: var(--ds-font-label);
   font-weight: 600;
-  height: 2.4444rem;
+  height: 36px;
   padding: 0 var(--ds-space-3);
 }
 

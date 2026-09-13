@@ -34,7 +34,7 @@ defineProps({
 .track {
   background: var(--ds-surface-sunken);
   border: 1px solid var(--ds-border-subtle);
-  height: 0.6667rem;
+  height: 12px;
 }
 
 .fill {

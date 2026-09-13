@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { CHART_SERIES } from '../../lib/chart'
 
 const props = defineProps({
   series: { type: Array, required: true },
@@ -8,7 +9,7 @@ const props = defineProps({
   height: { type: Number, default: 220 },
 })
 
-const colors = ['var(--ds-chart-1)', 'var(--ds-chart-2)', 'var(--ds-chart-3)', 'var(--ds-chart-4)']
+const colors = CHART_SERIES
 const pad = { l: 36, r: 8, t: 12, b: 28 }
 
 const bounds = computed(() => {
@@ -110,7 +111,7 @@ const thresholdY = computed(() => (props.threshold == null ? null : y(props.thre
 }
 
 .swatch {
-  height: 0.6667rem;
-  width: 0.6667rem;
+  height: 12px;
+  width: 12px;
 }
 </style>

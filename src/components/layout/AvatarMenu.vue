@@ -29,11 +29,11 @@ function logout() {
       <span class="ds-meta">{{ platformRole[auth.user.platformRole] }} · {{ auth.user.title }}</span>
     </p>
     <button type="button" role="menuitem" @click="go('/settings')">
-      <DsIcon :is="Settings" :size="20" />
+      <DsIcon :is="Settings" :size="18" />
       설정
     </button>
     <button type="button" role="menuitem" @click="logout">
-      <DsIcon :is="LogOut" :size="20" />
+      <DsIcon :is="LogOut" :size="18" />
       로그아웃
     </button>
   </div>
@@ -44,7 +44,7 @@ function logout() {
   background: var(--ds-surface-raised);
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-md);
-  min-width: 16rem;
+  min-width: 256px;
   padding: var(--ds-space-3);
   position: absolute;
   right: 0;
@@ -56,7 +56,7 @@ function logout() {
   border-bottom: 1px solid var(--ds-border-subtle);
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 4px;
   margin-bottom: var(--ds-space-2);
   padding: var(--ds-space-2) var(--ds-space-3) var(--ds-space-3);
 }
@@ -68,7 +68,7 @@ function logout() {
   font-size: var(--ds-font-label);
   font-weight: 600;
   gap: var(--ds-space-2);
-  min-height: 2.4444rem;
+  min-height: 36px;
   padding: 0 var(--ds-space-3);
   width: 100%;
 }

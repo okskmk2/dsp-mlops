@@ -112,7 +112,7 @@ const columns = [
         <DsStackedBar :labels="stacked.labels" :series="stacked.series" />
       </DsCard>
     </div>
-    <DsCard style="margin-top: 32px">
+    <DsCard class="ds-follow">
       <template #title>내역</template>
       <DsTable :columns="columns" :rows="records.map((r, i) => ({ ...r, id: i }))">
         <template #platform="{ row }">{{ platformType[row.platform] }}</template>
@@ -125,7 +125,7 @@ const columns = [
 <style scoped>
 .grid {
   display: grid;
-  gap: var(--ds-space-6);
-  grid-template-columns: 22rem 1fr;
+  gap: var(--ds-section-gap);
+  grid-template-columns: 352px 1fr;
 }
 </style>

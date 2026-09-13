@@ -1,7 +1,7 @@
 <script setup>
 defineProps({
   is: { type: [Object, Function], required: true },
-  size: { type: Number, default: 24 },
+  size: { type: Number, default: 20 },
 })
 </script>
 

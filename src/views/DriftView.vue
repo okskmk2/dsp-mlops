@@ -48,7 +48,7 @@ const chartSeries = computed(() => {
     </template>
   </DsPageHeader>
 
-  <DsCard v-if="model?.championHealth === 'at_risk'" style="margin-bottom: 24px">
+  <DsCard v-if="model?.championHealth === 'at_risk'" class="ds-mb-section">
     <template #title>Champion 위험</template>
     <p class="ds-body">{{ model.name }} {{ model.version }} 자격이 위험입니다. 강등 또는 재학습을 검토하세요.</p>
   </DsCard>
@@ -77,7 +77,7 @@ const chartSeries = computed(() => {
     <p v-else class="ds-meta">선택한 모델의 시리즈가 없습니다.</p>
   </DsCard>
 
-  <DsCard style="margin-top: 32px">
+  <DsCard class="ds-follow">
     <template #title>이벤트</template>
     <DsTable
       :columns="[

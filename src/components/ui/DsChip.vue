@@ -18,9 +18,9 @@ defineProps({
   display: inline-flex;
   font-size: var(--ds-font-meta);
   font-weight: 400;
-  height: 1.5556rem;
-  line-height: 1.4;
-  padding: 0 0.5556rem;
+  height: 24px;
+  line-height: 1.35;
+  padding: 0 8px;
   white-space: nowrap;
 }
 

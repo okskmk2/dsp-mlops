@@ -12,7 +12,7 @@ defineEmits(['update:modelValue', 'submit'])
 
 <template>
   <form class="ds-search" role="search" @submit.prevent="$emit('submit')">
-    <DsIcon :is="Search" :size="20" />
+    <DsIcon :is="Search" :size="18" />
     <input
       :value="modelValue"
       :placeholder="placeholder"
@@ -32,7 +32,7 @@ defineEmits(['update:modelValue', 'submit'])
   display: flex;
   gap: var(--ds-space-2);
   height: var(--ds-control-h);
-  max-width: 31.1111rem;
+  max-width: 496px;
   padding: 0 var(--ds-space-3);
   width: 100%;
 }
@@ -48,7 +48,7 @@ defineEmits(['update:modelValue', 'submit'])
   border: 0;
   color: var(--ds-text);
   flex: 1;
-  font-size: var(--ds-font-body);
+  font-size: var(--ds-font-label);
   height: 100%;
   min-width: 0;
   outline: none;

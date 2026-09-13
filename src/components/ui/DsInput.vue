@@ -29,18 +29,18 @@ defineEmits(['update:modelValue'])
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-md);
   color: var(--ds-text);
-  font-size: var(--ds-font-body);
+  font-size: var(--ds-font-label);
   height: var(--ds-control-h);
-  padding: 0 var(--ds-space-4);
-  width: 15.5556rem;
+  padding: 0 var(--ds-space-3);
+  width: 248px;
 }
 
 .ds-input.is-sm {
-  width: 8.8889rem;
+  width: 144px;
 }
 
 .ds-input.is-lg {
-  width: 23.3333rem;
+  width: 372px;
 }
 
 .ds-input.is-full {
@@ -55,13 +55,13 @@ defineEmits(['update:modelValue'])
   border-color: var(--ds-primary);
   border-width: 2px;
   outline: none;
-  padding: 0 calc(var(--ds-space-4) - 1px);
+  padding: 0 calc(var(--ds-space-3) - 1px);
 }
 
 .ds-input.is-invalid {
   border-color: var(--ds-danger);
   border-width: 2px;
-  padding: 0 calc(var(--ds-space-4) - 1px);
+  padding: 0 calc(var(--ds-space-3) - 1px);
 }
 
 .ds-input:disabled {

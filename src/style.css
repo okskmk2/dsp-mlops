@@ -1,38 +1,42 @@
 :root {
-  --ds-font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --ds-font-sans: "Noto Sans KR", system-ui, sans-serif;
   --ds-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --ds-font-meta: 12px;
   --ds-font-label: 14px;
   --ds-font-body: 16px;
   --ds-font-title-sm: 18px;
-  --ds-font-title: 24px;
-  --ds-font-title-lg: 28px;
-  --ds-font-display: 32px;
-  --ds-radius-sm: 0.3333rem;
-  --ds-radius-md: 0.4444rem;
-  --ds-radius-lg: 0.6667rem;
-  --ds-space-unit: 0.2222rem;
-  --ds-space-1: 0.2222rem;
-  --ds-space-2: 0.4444rem;
-  --ds-space-3: 0.6667rem;
-  --ds-space-4: 0.8889rem;
-  --ds-space-5: 1.1111rem;
-  --ds-space-6: 1.3333rem;
-  --ds-space-7: 1.7778rem;
-  --ds-space-8: 2.2222rem;
-  --ds-space-9: 2.6667rem;
-  --ds-space-10: 3.5556rem;
-  --ds-control-h: 2.4444rem;
-  --ds-control-h-sm: 2.2222rem;
-  --ds-control-h-lg: 2.6667rem;
-  --ds-gnb-h: 3.5556rem;
-  --ds-snb-w: 14.4444rem;
+  --ds-font-title: 22px;
+  --ds-font-title-lg: 24px;
+  --ds-font-display: 26px;
+  --ds-radius-sm: 2px;
+  --ds-radius-md: 4px;
+  --ds-radius-lg: 4px;
+  --ds-space-unit: 4px;
+  --ds-space-1: 4px;
+  --ds-space-2: 8px;
+  --ds-space-3: 12px;
+  --ds-space-4: 16px;
+  --ds-space-5: 20px;
+  --ds-space-6: 24px;
+  --ds-space-7: 32px;
+  --ds-space-8: 40px;
+  --ds-space-9: 48px;
+  --ds-space-10: 64px;
+  --ds-control-h: 40px;
+  --ds-control-h-sm: 32px;
+  --ds-control-h-lg: 44px;
+  --ds-gnb-h: 52px;
+  --ds-snb-w: 232px;
+  --ds-page-pad-x: 44px;
+  --ds-page-pad-y: 32px;
+  --ds-card-pad: 20px;
+  --ds-section-gap: 20px;
   --ds-duration: 80ms;
   --ds-duration-fast: 120ms;
   --ds-easing: linear;
-  --ds-icon-sm: 1.1111rem;
-  --ds-icon-md: 1.3333rem;
-  --ds-icon-lg: 1.5556rem;
+  --ds-icon-sm: 18px;
+  --ds-icon-md: 20px;
+  --ds-icon-lg: 22px;
   --ds-z-gnb: 20;
   --ds-z-dropdown: 30;
   --ds-z-popover: 40;
@@ -41,7 +45,7 @@
   --ds-z-toast: 70;
 }
 
-:root[data-theme='light'] {
+:root[data-theme="light"] {
   color-scheme: light;
   --ds-canvas: #ffffff;
   --ds-canvas-subtle: #f5f5f7;
@@ -82,17 +86,18 @@
   --ds-neutral: #6e6e73;
   --ds-neutral-subtle: #f5f5f7;
   --ds-on-neutral: #1d1d1f;
-  --ds-chart-1: #1d1d1f;
-  --ds-chart-2: #db0000;
-  --ds-chart-3: #515154;
-  --ds-chart-4: #0f6b3c;
-  --ds-chart-5: #8a5a00;
-  --ds-chart-6: #86868b;
+  --ds-chart-1: #0b6e99;
+  --ds-chart-2: #1a7a52;
+  --ds-chart-3: #c05612;
+  --ds-chart-4: #5b4cb8;
+  --ds-chart-5: #a11a6a;
+  --ds-chart-6: #8a6a12;
+  --ds-chart-7: #2f6f73;
   --ds-chart-grid: #e8e8ed;
   --ds-chart-axis: #6e6e73;
 }
 
-:root[data-theme='dark'] {
+:root[data-theme="dark"] {
   color-scheme: dark;
   --ds-canvas: #000000;
   --ds-canvas-subtle: #1c1c1e;
@@ -133,42 +138,42 @@
   --ds-neutral: #a1a1a6;
   --ds-neutral-subtle: #2c2c2e;
   --ds-on-neutral: #f5f5f7;
-  --ds-chart-1: #f5f5f7;
-  --ds-chart-2: #ff5c5c;
-  --ds-chart-3: #c7c7cc;
-  --ds-chart-4: #30a46c;
-  --ds-chart-5: #e0a21b;
-  --ds-chart-6: #86868b;
+  --ds-chart-1: #4ba3d1;
+  --ds-chart-2: #3dbf84;
+  --ds-chart-3: #e08940;
+  --ds-chart-4: #9b8cff;
+  --ds-chart-5: #e070a8;
+  --ds-chart-6: #d4b84a;
+  --ds-chart-7: #5fb8b8;
   --ds-chart-grid: #2c2c2e;
   --ds-chart-axis: #a1a1a6;
 }
 
 html {
   font-size: 16px;
-  min-width: 1920px;
 }
 
 @media (min-width: 2560px) {
   :root {
-    --ds-font-meta: 14px;
-    --ds-font-label: 16px;
-    --ds-font-body: 18px;
+    --ds-font-meta: 13px;
+    --ds-font-label: 15px;
+    --ds-font-body: 17px;
     --ds-font-title-sm: 20px;
-    --ds-font-title: 26px;
-    --ds-font-title-lg: 32px;
-    --ds-font-display: 36px;
+    --ds-font-title: 24px;
+    --ds-font-title-lg: 26px;
+    --ds-font-display: 30px;
   }
 }
 
 @media (min-width: 3840px) {
   :root {
-    --ds-font-meta: 16px;
-    --ds-font-label: 18px;
-    --ds-font-body: 20px;
-    --ds-font-title-sm: 24px;
-    --ds-font-title: 32px;
-    --ds-font-title-lg: 40px;
-    --ds-font-display: 48px;
+    --ds-font-meta: 14px;
+    --ds-font-label: 16px;
+    --ds-font-body: 18px;
+    --ds-font-title-sm: 22px;
+    --ds-font-title: 26px;
+    --ds-font-title-lg: 30px;
+    --ds-font-display: 34px;
   }
 }
 
@@ -182,8 +187,9 @@ html,
 body,
 #app {
   margin: 0;
-  min-width: 1920px;
   min-height: 100%;
+  min-width: 0;
+  width: 100%;
 }
 
 body {
@@ -192,7 +198,7 @@ body {
   font-family: var(--ds-font-sans);
   font-size: var(--ds-font-body);
   font-synthesis: none;
-  line-height: 1.5;
+  line-height: 1.45;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   word-break: keep-all;
@@ -263,8 +269,8 @@ dd {
   column-gap: var(--ds-space-4);
   display: grid;
   grid-template-columns: 128px minmax(0, 1fr);
-  min-height: 44px;
-  padding: 14px 0;
+  min-height: 36px;
+  padding: 10px 0;
 }
 
 .ds-dl > div:last-child {
@@ -285,9 +291,9 @@ dd {
 
 .ds-dl dd {
   color: var(--ds-text);
-  font-size: var(--ds-font-body);
+  font-size: var(--ds-font-label);
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.4;
   min-width: 0;
 }
 
@@ -322,7 +328,7 @@ img {
   font-size: var(--ds-font-title-lg);
   font-weight: 600;
   letter-spacing: -0.025em;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 .ds-title {
@@ -330,7 +336,7 @@ img {
   font-size: var(--ds-font-title);
   font-weight: 600;
   letter-spacing: -0.02em;
-  line-height: 1.3;
+  line-height: 1.25;
 }
 
 .ds-title-sm {
@@ -338,35 +344,50 @@ img {
   font-size: var(--ds-font-title-sm);
   font-weight: 600;
   letter-spacing: -0.01em;
-  line-height: 1.35;
+  line-height: 1.3;
 }
 
 .ds-body {
   color: var(--ds-text);
   font-size: var(--ds-font-body);
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 .ds-body-strong {
   color: var(--ds-text);
   font-size: var(--ds-font-body);
   font-weight: 600;
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 .ds-label {
   color: var(--ds-text);
   font-size: var(--ds-font-label);
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
 .ds-meta {
   color: var(--ds-text-secondary);
   font-size: var(--ds-font-meta);
   font-weight: 400;
-  line-height: 1.4;
+  line-height: 1.35;
+}
+
+.ds-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-space-2);
+  margin-top: var(--ds-space-2);
+}
+
+.ds-follow {
+  margin-top: var(--ds-section-gap);
+}
+
+.ds-mb-section {
+  margin-bottom: var(--ds-section-gap);
 }
 
 .skip-link {
@@ -379,7 +400,7 @@ img {
   left: var(--ds-space-4);
   padding: var(--ds-space-3) var(--ds-space-4);
   position: absolute;
-  top: -6rem;
+  top: -96px;
   z-index: 80;
 }
 

@@ -28,9 +28,9 @@ defineEmits(['update:modelValue'])
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-md);
   color: var(--ds-text);
-  font-size: var(--ds-font-body);
-  line-height: 1.5;
-  min-height: 6.6667rem;
+  font-size: var(--ds-font-label);
+  line-height: 1.45;
+  min-height: 96px;
   padding: var(--ds-space-3) var(--ds-space-4);
   resize: vertical;
   width: 100%;

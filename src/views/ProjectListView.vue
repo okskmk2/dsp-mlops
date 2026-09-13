@@ -104,6 +104,6 @@ function open(row) {
 .filters {
   display: flex;
   gap: var(--ds-space-3);
-  margin-bottom: var(--ds-space-5);
+  margin-bottom: var(--ds-space-4);
 }
 </style>

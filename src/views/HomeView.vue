@@ -17,10 +17,12 @@ import {
   championHealthChip,
   monitorResult,
   monitorResultChip,
+  noticeSeverityChip,
   projectStatus,
   projectStatusChip,
   provisionRollup,
 } from '../data/labels'
+import { postPath } from '../lib/support'
 import { useDspStore } from '../stores/dsp'
 
 const dsp = useDspStore()
@@ -33,6 +35,7 @@ const provisioning = computed(() =>
     .map((p) => ({ project: p, rollup: dsp.provisionRollup(p.id) }))
     .filter((x) => x.rollup === 'in_progress' || x.rollup === 'failed'),
 )
+const notices = computed(() => dsp.pinnedNotices())
 
 const attentionCols = [
   { key: 'name', label: '모델', strong: true },
@@ -56,12 +59,24 @@ const approvalCols = [
     </template>
   </DsPageHeader>
 
-  <DsBanner v-if="kpis.monitorFailCount" tone="danger">
-    모니터 실패 모델이 {{ kpis.monitorFailCount }}건입니다. 기준치와 드리프트를 확인하세요.
-    <template #action>
-      <DsButton variant="secondary" to="/monitoring">현황</DsButton>
-    </template>
-  </DsBanner>
+  <div v-if="notices.length || kpis.monitorFailCount" class="banners">
+    <DsBanner
+      v-for="notice in notices"
+      :key="notice.id"
+      :tone="noticeSeverityChip[notice.severity] || 'info'"
+    >
+      {{ notice.title }}
+      <template #action>
+        <DsButton variant="secondary" :to="postPath(notice)">공지</DsButton>
+      </template>
+    </DsBanner>
+    <DsBanner v-if="kpis.monitorFailCount" tone="danger">
+      모니터 실패 모델이 {{ kpis.monitorFailCount }}건입니다. 기준치와 드리프트를 확인하세요.
+      <template #action>
+        <DsButton variant="secondary" to="/monitoring">현황</DsButton>
+      </template>
+    </DsBanner>
+  </div>
 
   <section class="kpis">
     <DsKpi label="Champion" :value="kpis.championCount" />
@@ -105,11 +120,11 @@ const approvalCols = [
         :columns="approvalCols"
         :rows="pending"
         empty-title="대기 중인 결재가 없습니다"
-        @row-click="(row) => router.push('/approvals')"
+        @row-click="(row) => router.push(`/approvals/${row.id}`)"
       >
         <template #type="{ row }">{{ approvalType[row.type] }}</template>
         <template #target="{ row }">
-          {{ dsp.projectById(row.payloadRef)?.name || dsp.modelById(row.payloadRef)?.name || row.payloadRef }}
+          {{ dsp.approvalTarget(row).name }}
         </template>
         <template #status="{ row }">
           <DsChip :tone="approvalStatusChip[row.status]">{{ approvalStatus[row.status] }}</DsChip>
@@ -135,16 +150,23 @@ const approvalCols = [
 </template>
 
 <style scoped>
+.banners {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2);
+  margin-bottom: var(--ds-section-gap);
+}
+
 .kpis {
   display: grid;
-  gap: var(--ds-space-6);
+  gap: var(--ds-section-gap);
   grid-template-columns: repeat(4, 1fr);
-  margin: var(--ds-space-6) 0 var(--ds-space-7);
+  margin: 0 0 var(--ds-section-gap);
 }
 
 .grid {
   display: grid;
-  gap: var(--ds-space-6);
+  gap: var(--ds-section-gap);
   grid-template-columns: 1.4fr 1fr;
 }
 
@@ -163,7 +185,7 @@ const approvalCols = [
   display: flex;
   gap: var(--ds-space-3);
   justify-content: space-between;
-  min-height: 2.8889rem;
+  min-height: 36px;
 }
 
 .prov a {

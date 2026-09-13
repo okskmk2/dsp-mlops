@@ -1,6 +1,7 @@
 <script setup>
 import { computed, reactive, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import DsBanner from '../components/ui/DsBanner.vue'
 import DsButton from '../components/ui/DsButton.vue'
 import DsCard from '../components/ui/DsCard.vue'
 import DsCheckbox from '../components/ui/DsCheckbox.vue'
@@ -22,6 +23,7 @@ const route = useRoute()
 const router = useRouter()
 
 const draftId = computed(() => (typeof route.query.draft === 'string' ? route.query.draft : ''))
+const fromRequestId = computed(() => (typeof route.query.fromRequest === 'string' ? route.query.fromRequest : ''))
 
 const form = reactive({
   name: '',
@@ -36,30 +38,46 @@ const form = reactive({
   useAzureDatabricks: false,
   azureMlSpec: { region: 'koreacentral', sku: 'standard' },
   databricksSpec: { region: 'koreacentral', sku: 'premium' },
+  sourceRequestId: null,
 })
+
+const sourceRequest = computed(() => (form.sourceRequestId ? dsp.analysisRequestById(form.sourceRequestId) : null))
 
 const errors = reactive({})
 
 watch(
-  draftId,
-  (id) => {
-    if (!id) return
-    const p = dsp.projectById(id)
-    if (!p || p.status !== 'draft') return
-    form.name = p.name
-    form.goal = p.goal
-    form.background = p.background
-    form.techStackText = (p.techStack || []).join(', ')
-    form.budgetAmount = String(p.budgetAmount || '')
-    form.startAt = p.startAt
-    form.endAt = p.endAt
-    form.useAzureMl = p.platforms.includes('azure_ml')
-    form.useAzureDatabricks = p.platforms.includes('azure_databricks')
-    if (p.azureMlSpec) Object.assign(form.azureMlSpec, p.azureMlSpec)
-    if (p.databricksSpec) Object.assign(form.databricksSpec, p.databricksSpec)
-    form.members = dsp.members
-      .filter((m) => m.projectId === id && m.userId !== auth.user.id)
-      .map((m) => ({ userId: m.userId, projectRole: m.projectRole }))
+  [draftId, fromRequestId],
+  ([id, requestId]) => {
+    if (id) {
+      const p = dsp.projectById(id)
+      if (!p || p.status !== 'draft') return
+      form.name = p.name
+      form.goal = p.goal
+      form.background = p.background
+      form.techStackText = (p.techStack || []).join(', ')
+      form.budgetAmount = String(p.budgetAmount || '')
+      form.startAt = p.startAt
+      form.endAt = p.endAt
+      form.useAzureMl = p.platforms.includes('azure_ml')
+      form.useAzureDatabricks = p.platforms.includes('azure_databricks')
+      if (p.azureMlSpec) Object.assign(form.azureMlSpec, p.azureMlSpec)
+      if (p.databricksSpec) Object.assign(form.databricksSpec, p.databricksSpec)
+      form.sourceRequestId = p.sourceRequestId || requestId || null
+      form.members = dsp.members
+        .filter((m) => m.projectId === id && m.userId !== auth.user.id)
+        .map((m) => ({ userId: m.userId, projectRole: m.projectRole }))
+      return
+    }
+    if (!requestId) return
+    const req = dsp.analysisRequestById(requestId)
+    if (!req) return
+    form.name = req.title
+    form.goal = req.desiredOutcome
+    form.background = [req.problem, req.businessContext].filter(Boolean).join('\n\n')
+    form.sourceRequestId = req.id
+    if (req.requesterId && req.requesterId !== auth.user.id) {
+      form.members = [{ userId: req.requesterId, projectRole: 'coordinator' }]
+    }
   },
   { immediate: true },
 )
@@ -119,6 +137,13 @@ function removeMember(i) {
 </script>
 
 <template>
+  <DsBanner v-if="sourceRequest" tone="info">
+    분석요청 「{{ sourceRequest.title }}」에서 이어집니다. 생성 결재가 올라가면 요청 상태가 새 프로젝트로 바뀝니다.
+    <template #action>
+      <DsButton variant="secondary" :to="`/requests/${sourceRequest.id}`">요청 보기</DsButton>
+    </template>
+  </DsBanner>
+
   <DsPageHeader title="프로젝트 생성 신청" description="승인되면 관리 상태는 즉시 운영중이 됩니다. 클라우드 리소스는 부가 프로비저닝으로 따라갑니다.">
     <template #actions>
       <DsButton variant="ghost" to="/projects">취소</DsButton>
@@ -247,14 +272,14 @@ function removeMember(i) {
 <style scoped>
 .layout {
   display: grid;
-  gap: var(--ds-space-6);
-  grid-template-columns: minmax(0, 1fr) 22.2222rem;
+  gap: var(--ds-section-gap);
+  grid-template-columns: minmax(0, 1fr) 356px;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--ds-space-7);
+  gap: var(--ds-section-gap);
 }
 
 .row,

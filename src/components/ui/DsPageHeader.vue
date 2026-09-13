@@ -21,13 +21,13 @@ defineProps({
 .ds-page-header {
   align-items: flex-start;
   display: flex;
-  gap: var(--ds-space-6);
+  gap: var(--ds-space-5);
   justify-content: space-between;
-  margin-bottom: var(--ds-space-7);
+  margin-bottom: var(--ds-space-5);
 }
 
 .ds-display {
-  margin-bottom: var(--ds-space-3);
+  margin-bottom: var(--ds-space-2);
 }
 
 .ds-page-actions {

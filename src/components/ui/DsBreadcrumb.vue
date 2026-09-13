@@ -26,7 +26,7 @@ defineProps({
   flex-wrap: wrap;
   font-size: var(--ds-font-meta);
   gap: var(--ds-space-2);
-  margin-bottom: var(--ds-space-4);
+  margin-bottom: var(--ds-space-3);
 }
 
 .sep {

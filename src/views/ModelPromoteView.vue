@@ -66,7 +66,7 @@ function submit() {
       />
     </DsCard>
 
-    <DsCard style="margin-top: 32px">
+    <DsCard class="ds-follow">
       <template #title>체크리스트</template>
       <DsCheckbox :model-value="checks.metrics" disabled label="지표 비교를 확인함" />
       <p>
@@ -77,7 +77,7 @@ function submit() {
       <DsCheckbox :model-value="checks.driftBelow" disabled :label="`드리프트 ${challenger.driftScore ?? '—'} < 0.25`" />
     </DsCard>
 
-    <DsCard style="margin-top: 32px">
+    <DsCard class="ds-follow">
       <template #title>결재선</template>
       <p class="ds-body">승인권자 {{ dsp.userById(dsp.approvalLines.find((l) => l.type === 'champion_promote')?.approverId)?.name }}</p>
     </DsCard>

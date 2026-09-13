@@ -1,12 +1,13 @@
 <script setup>
 import { computed } from 'vue'
+import { CHART_SERIES } from '../../lib/chart'
 
 const props = defineProps({
   series: { type: Array, required: true },
   labels: { type: Array, required: true },
 })
 
-const colors = ['var(--ds-chart-1)', 'var(--ds-chart-2)', 'var(--ds-chart-3)']
+const colors = CHART_SERIES
 const max = computed(() => {
   const sums = props.labels.map((_, i) => props.series.reduce((s, ser) => s + (ser.values[i] || 0), 0))
   return Math.max(1, ...sums)
@@ -33,7 +34,7 @@ const max = computed(() => {
   </div>
   <ul class="legend">
     <li v-for="(ser, i) in series" :key="ser.label">
-      <span class="swatch" :style="{ background: ser.color || colors[i] }" />
+      <span class="swatch" :style="{ background: ser.color || colors[i % colors.length] }" />
       {{ ser.label }}
     </li>
   </ul>
@@ -44,7 +45,7 @@ const max = computed(() => {
   align-items: flex-end;
   display: flex;
   gap: var(--ds-space-4);
-  height: 12.2222rem;
+  height: 196px;
 }
 
 .col {
@@ -80,7 +81,7 @@ const max = computed(() => {
 }
 
 .swatch {
-  height: 0.6667rem;
-  width: 0.6667rem;
+  height: 12px;
+  width: 12px;
 }
 </style>

@@ -158,8 +158,8 @@ const columns = [
 <style scoped>
 .layout {
   display: grid;
-  gap: var(--ds-space-6);
-  grid-template-columns: minmax(0, 1fr) 22.2222rem;
+  gap: var(--ds-section-gap);
+  grid-template-columns: minmax(0, 1fr) 356px;
 }
 
 .row {

@@ -38,6 +38,9 @@ const history = computed(() => dsp.approvals.filter((a) => a.payloadRef === id.v
 const pendingClose = computed(() =>
   history.value.some((a) => a.type === 'project_close' && a.status === 'pending'),
 )
+const pendingUpgrade = computed(() =>
+  history.value.filter((a) => a.type === 'compute_upgrade' && a.status === 'pending'),
+)
 const rollup = computed(() => dsp.provisionRollup(id.value))
 const budgetOpen = ref(false)
 const newBudget = ref('')
@@ -92,6 +95,12 @@ function openCloud() {
     </div>
 
     <DsBanner v-if="pendingClose" tone="warning">종료 품의가 진행 중입니다. 승인 전까지 프로젝트는 운영중으로 유지됩니다.</DsBanner>
+    <DsBanner v-if="pendingUpgrade.length" tone="warning">
+      컴퓨팅 상향 품의가 {{ pendingUpgrade.length }}건 대기 중입니다. 프로젝트 상태는 운영중 그대로입니다.
+      <template #action>
+        <DsButton variant="secondary" :to="`/projects/${project.id}/resources`">리소스</DsButton>
+      </template>
+    </DsBanner>
     <DsBanner v-if="rollup === 'failed'" tone="danger">
       프로비저닝 실패 항목이 있습니다. 프로젝트 상태는 운영중 그대로입니다.
       <template v-if="canRetryProvisioning(auth.user)" #action>
@@ -130,7 +139,7 @@ function openCloud() {
           </li>
           <li v-for="p in items" :key="p.id">
             <div>
-              <span class="ds-body-strong">{{ platformType[p.platform] }} 프로비저닝</span>
+              <span class="ds-body-strong">{{ platformType[p.platform] }} {{ p.kind === 'compute_upgrade' ? '컴퓨팅 상향' : '프로비저닝' }}</span>
               <DsChip :tone="provisionStatusChip[p.status]">{{ provisionStatus[p.status] }}</DsChip>
             </div>
             <p class="ds-meta">{{ p.cloudResourceId || p.errorMessage || '부가 작업' }}</p>
@@ -166,9 +175,9 @@ function openCloud() {
 
 .two {
   display: grid;
-  gap: var(--ds-space-6);
+  gap: var(--ds-section-gap);
   grid-template-columns: 1fr 1fr;
-  margin-top: var(--ds-space-6);
+  margin-top: var(--ds-section-gap);
 }
 
 .tl {

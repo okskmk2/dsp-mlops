@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import { CHART_SERIES } from '../../lib/chart'
 
 const props = defineProps({
   segments: { type: Array, required: true },
@@ -7,7 +8,7 @@ const props = defineProps({
   label: { type: String, default: '' },
 })
 
-const colors = ['var(--ds-chart-1)', 'var(--ds-chart-2)', 'var(--ds-chart-3)', 'var(--ds-chart-4)', 'var(--ds-chart-5)', 'var(--ds-chart-6)']
+const colors = CHART_SERIES
 const r = 54
 const c = 2 * Math.PI * r
 
@@ -89,11 +90,11 @@ const rings = computed(() => {
   display: grid;
   font-size: var(--ds-font-meta);
   gap: var(--ds-space-2);
-  grid-template-columns: 0.6667rem 1fr auto;
+  grid-template-columns: 12px 1fr auto;
 }
 
 .swatch {
-  height: 0.6667rem;
-  width: 0.6667rem;
+  height: 12px;
+  width: 12px;
 }
 </style>

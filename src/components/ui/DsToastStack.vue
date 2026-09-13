@@ -18,10 +18,10 @@ const ui = useUiStore()
   flex-direction: column;
   gap: var(--ds-space-2);
   left: 50%;
-  margin-left: -13.3333rem;
+  margin-left: -214px;
   position: fixed;
   top: var(--ds-space-4);
-  width: 26.6667rem;
+  width: 428px;
   z-index: var(--ds-z-toast);
 }
 
@@ -29,6 +29,7 @@ const ui = useUiStore()
   background: var(--ds-surface-raised);
   border: 1px solid var(--ds-border);
   border-radius: var(--ds-radius-md);
+  font-size: var(--ds-font-label);
   padding: var(--ds-space-4);
   transition: opacity var(--ds-duration-fast) var(--ds-easing);
 }
