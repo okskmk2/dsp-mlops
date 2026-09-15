@@ -1,0 +1,37 @@
+{
+  "screens": [
+    {
+      "id": "datasetRegistry",
+      "route": "/datasets",
+      "view": "src/views/DatasetRegistryView.vue",
+      "purpose": "권한 범위 안의 데이터셋과 스키마를 탐색한다.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "list",
+          "method": "GET",
+          "path": "/api/v1/datasets",
+          "query": { "project": "string", "stage": "draft | challenger | champion | empty", "q": "string" },
+          "response": { "items": ["DatasetListItem"] }
+        }
+      ]
+    },
+    {
+      "id": "datasetDetail",
+      "route": "/datasets/:id",
+      "view": "src/views/DatasetDetailView.vue",
+      "purpose": "데이터셋 속성, 컬럼 정보와 직접 소비자를 확인한다.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "get",
+          "method": "GET",
+          "path": "/api/v1/datasets/:id",
+          "response": { "dataset": "Dataset", "columns": ["DatasetColumn"], "consumers": ["LineageConsumer"] }
+        }
+      ]
+    }
+  ]
+}

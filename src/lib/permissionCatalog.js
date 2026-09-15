@@ -22,8 +22,8 @@ export const PAGE_PERMISSION_GROUPS = [
     group: '모델',
     items: [
       { key: 'models.registry', label: '모델 레지스트리' },
-      { key: 'models.promotions', label: '승격 현황' },
       { key: 'models.detail', label: '모델 상세' },
+      { key: 'datasets.list', label: '데이터셋' },
     ],
   },
   {

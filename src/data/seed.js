@@ -263,8 +263,10 @@ export function createSeed() {
     datasets: [
       {
         id: 'ds-sales',
+        projectId: 'p-demand',
         name: '상품판매_일별_정합성검증',
         type: 'dataset',
+        stage: 'champion',
         ref: 'uc://governed.retail.sales_daily',
         columns: [
           { name: 'date', dataType: 'DATE', nullable: false, description: '판매 기준일' },
@@ -277,8 +279,10 @@ export function createSeed() {
       },
       {
         id: 'ds-promo',
+        projectId: 'p-demand',
         name: '상품행사_승인캘린더',
         type: 'dataset',
+        stage: 'challenger',
         ref: 'uc://governed.retail.promotion_calendar',
         columns: [
           { name: 'promo_id', dataType: 'STRING', nullable: false, description: '행사 식별자' },
@@ -291,8 +295,10 @@ export function createSeed() {
       },
       {
         id: 'ds-sensor',
+        projectId: 'p-quality',
         name: '생산라인센서_품질승인본',
         type: 'dataset',
+        stage: 'champion',
         ref: 'uc://governed.manufacturing.line_sensor',
         columns: [
           { name: 'line_id', dataType: 'STRING', nullable: false, description: '생산라인 식별자' },
@@ -304,8 +310,10 @@ export function createSeed() {
       },
       {
         id: 'ds-call',
+        projectId: 'p-speech',
         name: '상담텍스트_비식별화본',
         type: 'dataset',
+        stage: 'challenger',
         ref: 'aml://datasets/governed/contact-center-text',
         columns: [
           { name: 'call_id', dataType: 'STRING', nullable: false, description: '상담 식별자' },
@@ -672,7 +680,7 @@ export function createSeed() {
         pageKeys: [
           'home', 'search', 'notifications',
           'projects.list', 'projects.create', 'projects.detail', 'projects.team', 'projects.resources',
-          'models.registry', 'models.promotions', 'models.detail',
+          'models.registry', 'models.detail', 'datasets.list',
           'monitoring.status', 'monitoring.thresholds', 'monitoring.drift',
           'cost.overview', 'cost.resources',
           'lineage.explore', 'lineage.contamination',
@@ -699,7 +707,7 @@ export function createSeed() {
         pageKeys: [
           'home', 'search', 'notifications',
           'projects.list', 'projects.detail', 'projects.team', 'projects.resources',
-          'models.registry', 'models.promotions', 'models.detail',
+          'models.registry', 'models.detail', 'datasets.list',
           'monitoring.status', 'monitoring.thresholds', 'monitoring.drift',
           'cost.overview', 'cost.resources',
           'lineage.explore',
@@ -724,7 +732,7 @@ export function createSeed() {
         pageKeys: [
           'home', 'search', 'notifications',
           'projects.list', 'projects.detail', 'projects.team', 'projects.resources',
-          'models.registry', 'models.detail',
+          'models.registry', 'models.detail', 'datasets.list',
           'monitoring.status',
           'lineage.explore',
           'requests',

@@ -441,6 +441,14 @@ export const useDspStore = defineStore('dsp', () => {
       demoteModel(approval.payloadRef)
     }
 
+    if (approval.type === 'dataset_promote' && approval.status === 'approved') {
+      promoteDataset(approval.payloadRef)
+    }
+
+    if (approval.type === 'dataset_demote' && approval.status === 'approved') {
+      demoteDataset(approval.payloadRef)
+    }
+
     if (approval.type === 'compute_upgrade' && approval.status === 'approved') {
       applyComputeUpgrade(approval)
     }
@@ -491,6 +499,21 @@ export const useDspStore = defineStore('dsp', () => {
     champion.stage = 'challenger'
     champion.championHealth = null
     notifyStageChange(champion, 'champion', 'challenger')
+  }
+
+  function promoteDataset(datasetId) {
+    const dataset = datasetById(datasetId)
+    if (!dataset) return
+    const from = dataset.stage
+    dataset.stage = 'champion'
+    notifyStageChange(dataset, from, 'champion')
+  }
+
+  function demoteDataset(datasetId) {
+    const dataset = datasetById(datasetId)
+    if (!dataset || dataset.stage !== 'champion') return
+    dataset.stage = 'challenger'
+    notifyStageChange(dataset, 'champion', 'challenger')
   }
 
   function registerChallenger(modelId) {
@@ -562,6 +585,14 @@ export const useDspStore = defineStore('dsp', () => {
         name: `${model.name} ${model.version}`.trim(),
         href: `/models/${model.id}`,
         projectId: model.projectId,
+      }
+    }
+    const dataset = datasetById(approval.payloadRef)
+    if (dataset) {
+      return {
+        name: dataset.name,
+        href: `/datasets/${dataset.id}`,
+        projectId: dataset.projectId,
       }
     }
     const provision = provisionById(approval.payloadRef)
@@ -896,7 +927,7 @@ export const useDspStore = defineStore('dsp', () => {
     return { ok: true }
   }
 
-  function submitDemotion(modelId) {
+  function submitDemotion(modelId, reason = '') {
     const auth = useAuthStore()
     const model = modelById(modelId)
     if (!model || model.stage !== 'champion') return { ok: false }
@@ -908,8 +939,45 @@ export const useDspStore = defineStore('dsp', () => {
       payloadRef: modelId,
       requesterId: auth.user.id,
       approverId: defaultApprover('champion_promote'),
+      reason: reason?.trim() || 'Champion 지위를 철회합니다.',
     })
     useUiStore().toast('강등 품의를 상신했습니다.')
+    return { ok: true }
+  }
+
+  function submitDatasetPromotion(datasetId, reason = '') {
+    const auth = useAuthStore()
+    const dataset = datasetById(datasetId)
+    if (!dataset || dataset.stage !== 'challenger') return { ok: false }
+    if (!dataset.projectId || !hasProjectRole(auth.user, dataset.projectId, state.value.members, ['owner', 'coordinator'])) {
+      return { ok: false }
+    }
+    pushApproval({
+      type: 'dataset_promote',
+      payloadRef: datasetId,
+      requesterId: auth.user.id,
+      approverId: defaultApprover('champion_promote'),
+      reason: reason?.trim() || '데이터셋을 Champion으로 승격합니다.',
+    })
+    useUiStore().toast('데이터셋 승격 품의를 상신했습니다.')
+    return { ok: true }
+  }
+
+  function submitDatasetDemotion(datasetId, reason = '') {
+    const auth = useAuthStore()
+    const dataset = datasetById(datasetId)
+    if (!dataset || dataset.stage !== 'champion') return { ok: false }
+    if (!dataset.projectId || !hasProjectRole(auth.user, dataset.projectId, state.value.members, ['owner', 'coordinator'])) {
+      return { ok: false }
+    }
+    pushApproval({
+      type: 'dataset_demote',
+      payloadRef: datasetId,
+      requesterId: auth.user.id,
+      approverId: defaultApprover('champion_promote'),
+      reason: reason?.trim() || 'Champion 지위를 철회합니다.',
+    })
+    useUiStore().toast('데이터셋 강등 품의를 상신했습니다.')
     return { ok: true }
   }
 

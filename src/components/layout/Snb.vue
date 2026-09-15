@@ -21,12 +21,12 @@ const items = [
   { id: 'home', label: '홈', route: '/home', icon: House },
   {
     id: 'browse',
-    label: '프로젝트·모델',
+    label: '자산 탐색',
     icon: FolderKanban,
     children: [
       { id: 'projectList', label: '프로젝트', route: '/projects' },
       { id: 'registry', label: '모델 레지스트리', route: '/models' },
-      { id: 'modelStatus', label: '모델 현황', route: '/models/promotions' },
+      { id: 'datasetList', label: '데이터셋', route: '/datasets' },
     ],
   },
   {
@@ -80,7 +80,7 @@ function isActive(path) {
   if (path === '/home') return route.path === '/home'
   if (path === '/projects') return route.path === '/projects'
   if (path === '/models') return route.path === '/models'
-  if (path === '/models/promotions') return route.path === '/models/promotions'
+  if (path === '/datasets') return route.path === '/datasets'
   if (path === '/models/promote-request') return route.path === '/models/promote-request'
   if (path === '/ml-ops') return route.path.startsWith('/ml-ops')
   if (path === '/resources/upgrade-request') return route.path === '/resources/upgrade-request'

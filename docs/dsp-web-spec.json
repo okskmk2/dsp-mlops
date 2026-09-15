@@ -126,12 +126,12 @@
         { "id": "home", "label": "홈", "route": "/home" },
         {
           "id": "browse",
-          "label": "프로젝트·모델",
-          "purpose": "이미 있는 프로젝트와 모델을 찾는다. 생성·승격 신청은 넣지 않는다.",
+          "label": "자산 탐색",
+          "purpose": "이미 있는 프로젝트, 모델, 데이터셋을 찾는다. 생성·승격 신청은 넣지 않는다.",
           "children": [
             { "id": "projectList", "label": "프로젝트", "route": "/projects" },
             { "id": "registry", "label": "모델 레지스트리", "route": "/models" },
-            { "id": "modelStatus", "label": "모델 현황", "route": "/models/promotions" }
+            { "id": "datasetList", "label": "데이터셋", "route": "/datasets" }
           ]
         },
         {

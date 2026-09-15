@@ -81,6 +81,8 @@ export const approvalType = {
   project_close: '프로젝트 종료',
   champion_promote: 'Champion 승격',
   champion_demote: 'Champion 강등',
+  dataset_promote: '데이터셋 승격',
+  dataset_demote: '데이터셋 강등',
   member_sensitive: '민감 멤버 변경',
   compute_upgrade: '컴퓨팅 상향',
 }

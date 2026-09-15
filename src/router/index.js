@@ -10,16 +10,19 @@ import ContaminationView from '../views/ContaminationView.vue'
 import CostResourcesView from '../views/CostResourcesView.vue'
 import CostView from '../views/CostView.vue'
 import DatasetDetailView from '../views/DatasetDetailView.vue'
+import DatasetDemoteView from '../views/DatasetDemoteView.vue'
+import DatasetPromoteView from '../views/DatasetPromoteView.vue'
+import DatasetRegistryView from '../views/DatasetRegistryView.vue'
 import DriftView from '../views/DriftView.vue'
 import HomeView from '../views/HomeView.vue'
 import LineageNodeView from '../views/LineageNodeView.vue'
 import LineageView from '../views/LineageView.vue'
 import LoginView from '../views/LoginView.vue'
 import ModelDetailView from '../views/ModelDetailView.vue'
+import ModelDemoteView from '../views/ModelDemoteView.vue'
 import ModelLineageView from '../views/ModelLineageView.vue'
 import ModelHistoryView from '../views/ModelHistoryView.vue'
 import ModelPromoteView from '../views/ModelPromoteView.vue'
-import ModelPromotionsView from '../views/ModelPromotionsView.vue'
 import ModelRegistryView from '../views/ModelRegistryView.vue'
 import ModelPromoteRequestView from '../views/ModelPromoteRequestView.vue'
 import ModelStakeholdersView from '../views/ModelStakeholdersView.vue'
@@ -79,14 +82,17 @@ const router = createRouter({
         { path: 'projects/:id/models', component: ProjectModelsView },
         { path: 'projects/:id/monitoring', component: ProjectMonitoringView },
         { path: 'models', component: ModelRegistryView },
-        { path: 'models/promotions', component: ModelPromotionsView },
         { path: 'models/promote-request', component: ModelPromoteRequestView },
         { path: 'models/:id', component: ModelDetailView },
         { path: 'models/:id/lineage', component: ModelLineageView },
         { path: 'models/:id/stakeholders', component: ModelStakeholdersView },
         { path: 'models/:id/history', component: ModelHistoryView },
         { path: 'models/:id/promote', component: ModelPromoteView },
+        { path: 'models/:id/demote', component: ModelDemoteView },
+        { path: 'datasets', component: DatasetRegistryView },
         { path: 'datasets/:id', component: DatasetDetailView },
+        { path: 'datasets/:id/promote', component: DatasetPromoteView },
+        { path: 'datasets/:id/demote', component: DatasetDemoteView },
         { path: 'monitoring', component: MonitorStatusView },
         { path: 'ml-ops', component: MLOpsView },
         { path: 'monitoring/thresholds', component: ThresholdsView },

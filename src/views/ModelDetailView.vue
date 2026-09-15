@@ -74,7 +74,7 @@ function lineageLink(id) {
           Challenger 등록
         </DsButton>
         <DsButton v-if="canPromo" variant="primary" :to="`/models/${model.id}/promote`">승격 요청</DsButton>
-        <DsButton v-if="canDemo" variant="danger" @click="dsp.submitDemotion(model.id)">강등 상신</DsButton>
+        <DsButton v-if="canDemo" variant="danger" :to="`/models/${model.id}/demote`">강등 상신</DsButton>
       </template>
     </DsPageHeader>
     <ModelSubnav :model-id="model.id" />

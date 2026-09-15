@@ -8,13 +8,28 @@ import DsChip from '../components/ui/DsChip.vue'
 import DsEmpty from '../components/ui/DsEmpty.vue'
 import DsTable from '../components/ui/DsTable.vue'
 import { modelStage, modelStageChip, nodeType } from '../data/labels'
+import { hasProjectRole } from '../lib/permissions'
+import { useAuthStore } from '../stores/auth'
 import { useDspStore } from '../stores/dsp'
 
 const route = useRoute()
+const auth = useAuthStore()
 const dsp = useDspStore()
 
 const dataset = computed(() => dsp.datasetById(route.params.id))
 const columns = computed(() => dataset.value?.columns || [])
+const canPromo = computed(
+  () =>
+    dataset.value?.stage === 'challenger' &&
+    dataset.value?.projectId &&
+    hasProjectRole(auth.user, dataset.value.projectId, dsp.members, ['owner', 'coordinator']),
+)
+const canDemo = computed(
+  () =>
+    dataset.value?.stage === 'champion' &&
+    dataset.value?.projectId &&
+    hasProjectRole(auth.user, dataset.value.projectId, dsp.members, ['owner', 'coordinator']),
+)
 
 const columnTableColumns = [
   { key: 'name', label: '컬럼명', strong: true },
@@ -57,6 +72,8 @@ const usingProjects = computed(() => {
 
     <div class="actions">
       <DsButton variant="ghost" :to="`/lineage/nodes/${dataset.id}`">계보 탐색</DsButton>
+      <DsButton v-if="canPromo" variant="primary" :to="`/datasets/${dataset.id}/promote`">승격 요청</DsButton>
+      <DsButton v-if="canDemo" variant="danger" :to="`/datasets/${dataset.id}/demote`">강등 상신</DsButton>
     </div>
 
     <DsCard>
@@ -65,6 +82,12 @@ const usingProjects = computed(() => {
         <div>
           <dt>유형</dt>
           <dd>{{ nodeType.dataset }}</dd>
+        </div>
+        <div>
+          <dt>스테이지</dt>
+          <dd>
+            <DsChip :tone="modelStageChip[dataset.stage]">{{ modelStage[dataset.stage] }}</DsChip>
+          </dd>
         </div>
         <div>
           <dt>ID</dt>

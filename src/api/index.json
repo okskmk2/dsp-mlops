@@ -18,7 +18,7 @@
     { "id": "projectModels", "route": "/projects/:id/models", "file": "screens/projects.json" },
 
     { "id": "modelRegistry", "route": "/models", "file": "screens/models.json" },
-    { "id": "modelPromotions", "route": "/models/promotions", "file": "screens/models.json" },
+    { "id": "datasetRegistry", "route": "/datasets", "file": "screens/datasets.json" },
     { "id": "modelDetail", "route": "/models/:id", "file": "screens/models.json" },
     { "id": "modelPromote", "route": "/models/:id/promote", "file": "screens/models.json" },
     { "id": "retrainModal", "route": "modal", "file": "screens/models.json" },

@@ -18,23 +18,6 @@
       ]
     },
     {
-      "id": "modelPromotions",
-      "route": "/models/promotions",
-      "view": "src/views/ModelPromotionsView.vue",
-      "purpose": "Champion 승격·강등 품의 목록.",
-      "auth": true,
-      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
-      "endpoints": [
-        {
-          "id": "list",
-          "method": "GET",
-          "path": "/api/v1/approvals",
-          "query": { "type": "champion_promote,champion_demote" },
-          "response": { "items": ["ApprovalListItem"] }
-        }
-      ]
-    },
-    {
       "id": "modelDetail",
       "route": "/models/:id",
       "view": "src/views/ModelDetailView.vue",
