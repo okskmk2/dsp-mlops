@@ -125,28 +125,45 @@
       "items": [
         { "id": "home", "label": "홈", "route": "/home" },
         {
-          "id": "assets",
-          "label": "ML 자산",
+          "id": "browse",
+          "label": "프로젝트·모델",
+          "purpose": "이미 있는 프로젝트와 모델을 찾는다. 생성·승격 신청은 넣지 않는다.",
           "children": [
-            { "id": "projectList", "label": "프로젝트 목록", "route": "/projects" },
-            { "id": "registry", "label": "모델 레지스트리", "route": "/models" }
+            { "id": "projectList", "label": "프로젝트", "route": "/projects" },
+            { "id": "registry", "label": "모델 레지스트리", "route": "/models" },
+            { "id": "modelStatus", "label": "모델 현황", "route": "/models/promotions" }
+          ]
+        },
+        {
+          "id": "requests",
+          "label": "신청",
+          "purpose": "결재·수용이 필요한 신규 작업을 올린다. 조회 화면과 섞지 않는다.",
+          "children": [
+            { "id": "projectCreate", "label": "프로젝트 생성", "route": "/projects/new" },
+            { "id": "requestList", "label": "분석 요청", "route": "/requests" },
+            { "id": "requestForm", "label": "분석 요청 작성", "route": "/requests/new" },
+            { "id": "modelPromoteRequest", "label": "모델 승격", "route": "/models/promote-request" },
+            { "id": "resourceUpgradeRequest", "label": "리소스 업그레이드", "route": "/resources/upgrade-request" }
           ]
         },
         {
           "id": "ops",
-          "label": "운영 관제",
+          "label": "운영 현황",
+          "purpose": "품질·리소스·비용·계보를 본다. 업그레이드 신청은 넣지 않는다.",
           "children": [
-            { "id": "monitorStatus", "label": "모니터 현황", "route": "/monitoring" },
-            { "id": "lineageExplore", "label": "리니지", "route": "/lineage" },
-            { "id": "costByProject", "label": "비용", "route": "/cost" }
+            { "id": "monitorStatus", "label": "모니터", "route": "/monitoring" },
+            { "id": "resourceStatus", "label": "리소스", "route": "/ml-ops" },
+            { "id": "costByProject", "label": "비용", "route": "/cost" },
+            { "id": "lineageExplore", "label": "리니지", "route": "/lineage" }
           ]
         },
         {
-          "id": "support",
-          "label": "지원센터",
+          "id": "help",
+          "label": "안내",
+          "purpose": "공지와 사용법. 분석 의뢰는 신청 그룹에 둔다.",
           "children": [
-            { "id": "requestList", "label": "분석 요청", "route": "/requests" },
-            { "id": "guides", "label": "사용법·공지", "route": "/support/guides" }
+            { "id": "notices", "label": "공지사항", "route": "/support/notices" },
+            { "id": "guides", "label": "서비스 가이드", "route": "/support/guides" }
           ]
         },
         {
@@ -158,7 +175,9 @@
           "children": [
             { "id": "adminUsers", "label": "사용자 관리", "route": "/admin/users" },
             { "id": "adminPermissions", "label": "권한 관리", "route": "/admin/permissions" },
-            { "id": "adminCodes", "label": "코드 관리", "route": "/admin/codes" }
+            { "id": "adminCodes", "label": "코드 관리", "route": "/admin/codes" },
+            { "id": "adminBatch", "label": "배치관리", "route": "/admin/batch" },
+            { "id": "adminUsage", "label": "사용자 사용 통계", "route": "/admin/usage" }
           ]
         }
       ]
@@ -479,8 +498,81 @@
     {
       "id": "home",
       "route": "/home",
-      "purpose": "관리자·오너가 이상 모델, 결재, 예산, 드리프트를 한눈에 본다.",
-      "ui": ["kpiRow", "cardGrid", "miniTable"],
+      "purpose": "관리자·오너가 이상 모델, 결재, 예산, 드리프트를 한눈에 본다. 로그인 후 최초 진입 화면이며 '오늘 무엇을 처리해야 하는가'에 답하는 대시보드다.",
+      "ui": ["pageHeader", "alertBannerStack", "kpiRow", "cardGrid", "miniTable", "provisioningList"],
+      "layoutSections": [
+        {
+          "id": "header",
+          "title": "홈",
+          "description": "이상 모델, 결재, 예산, 드리프트를 한눈에 봅니다.",
+          "actions": [{ "id": "createProject", "label": "프로젝트 생성", "roles": ["general", "officer", "dsp_admin"], "action": "nav:/projects/new" }]
+        },
+        {
+          "id": "alertBanners",
+          "order": 1,
+          "purpose": "즉시 조치가 필요한 사항을 페이지 최상단에 노출. KPI보다 우선순위 높음.",
+          "sources": [
+            { "kind": "pinnedNotice", "max": 2, "tone": "notice.severity 기반(info|warning|danger)", "action": "nav:/support/notices/:id" },
+            { "kind": "monitorFailAlert", "condition": "kpi.monitorFailCount > 0", "tone": "danger", "text": "모니터 실패 모델이 N건입니다. 기준치와 드리프트를 확인하세요.", "action": "nav:/monitoring" }
+          ],
+          "emptyBehavior": "조건 미충족 시 배너 영역 자체를 렌더링하지 않음(레이아웃 점프 없음)"
+        },
+        {
+          "id": "kpiRow",
+          "order": 2,
+          "layout": "4 columns, equal width, responsive to 2x2 below md breakpoint",
+          "cards": [
+            { "id": "championCount", "label": "Champion", "alert": false, "drilldown": "nav:/models?stage=champion" },
+            { "id": "monitorFailCount", "label": "모니터 실패", "alert": "value > 0", "drilldown": "nav:/monitoring" },
+            { "id": "driftCount", "label": "드리프트 경보", "alert": "value > 0", "drilldown": "nav:/monitoring?tab=drift" },
+            { "id": "overBudgetProjectCount", "label": "예산 초과 프로젝트", "alert": "value > 0", "drilldown": "nav:/cost?filter=overBudget" }
+          ],
+          "notes": "alert=true인 카드는 강조 색(danger 톤)과 아이콘으로 구분. 값은 정수, 0은 회색조로 표시해 '정상' 임을 시각적으로 구분."
+        },
+        {
+          "id": "cardGrid",
+          "order": 3,
+          "layout": "left column 1.4fr(주의 모델 위, 내 결재 아래는 아님 - 실제로는 좌: 주의모델, 우: 내 결재, 하단 전체폭: 프로비저닝)",
+          "cards": [
+            {
+              "id": "attentionModels",
+              "title": "주의 모델",
+              "action": { "label": "레지스트리", "route": "/models" },
+              "table": {
+                "columns": ["name+version", "project", "stage", "championHealth", "lastMonitor"],
+                "rowLimit": "no explicit cap in payload; UI shows top N returned by API(권장 5~8)",
+                "rowClick": "nav:/models/:id",
+                "sort": "심각도 우선(모니터 fail > 드리프트 경보 > 건강도 저하) 후 최신순, 서버 정렬",
+                "emptyTitle": "주의가 필요한 모델이 없습니다"
+              }
+            },
+            {
+              "id": "pendingApprovals",
+              "title": "내 결재",
+              "action": { "label": "결재함", "route": "/approvals" },
+              "table": {
+                "columns": ["type", "target", "status"],
+                "rowLimit": 3,
+                "rowClick": "nav:/approvals/:id",
+                "sort": "상신일 오름차순(오래 대기한 건 우선)",
+                "emptyTitle": "대기 중인 결재가 없습니다"
+              }
+            },
+            {
+              "id": "provisioning",
+              "title": "프로비저닝",
+              "description": "부가 작업입니다. 프로젝트 관리 상태를 바꾸지 않습니다.",
+              "fullWidth": true,
+              "list": {
+                "itemFields": ["projectName(link)", "rollupChip(in_progress|failed)", "projectStatusChip"],
+                "filter": "rollup in [in_progress, failed]만 노출(completed는 숨김)",
+                "itemClick": "nav:/projects/:id/resources",
+                "emptyTitle": "진행 중인 프로비저닝이 없습니다"
+              }
+            }
+          ]
+        }
+      ],
       "data": [
         "kpi.championCount",
         "kpi.monitorFailCount",
@@ -494,24 +586,80 @@
       "buttons": [
         { "id": "createProject", "label": "프로젝트 생성", "roles": ["general", "officer", "dsp_admin"], "action": "nav:/projects/new" },
         { "id": "openModel", "label": "모델 상세", "action": "nav:/models/:id" },
-        { "id": "openApproval", "label": "결재 처리", "action": "nav:/approvals/:id" }
-      ]
+        { "id": "openApproval", "label": "결재 처리", "action": "nav:/approvals/:id" },
+        { "id": "openNotice", "label": "공지", "action": "nav:/support/notices/:id" },
+        { "id": "openMonitoring", "label": "현황", "action": "nav:/monitoring" }
+      ],
+      "roleVisibility": {
+        "general": "attentionModels/pendingApprovals/provisioning는 본인 소속 프로젝트 범위로 서버에서 필터됨",
+        "officer|dsp_admin": "전 프로젝트 범위. scope 토글 없음(홈은 항상 관제 목적이므로 전체 노출)"
+      },
+      "emptyState": "모든 위젯이 비어 있어도 페이지 골격(헤더+KPI 0값)은 유지. KPI가 전부 0이면 배너 없이 조용한 대시보드로 표시.",
+      "loadingState": "각 카드/위젯 단위 스켈레톤. 단일 실패 위젯은 나머지에 영향 없이 인라인 에러(재시도 버튼) 표시.",
+      "refresh": "포커스 복귀 시 자동 재조회(stale 방지). 수동 새로고침 버튼은 없음."
     },
     {
       "id": "projectList",
       "route": "/projects",
-      "purpose": "권한 범위 내 프로젝트 운영 상태 파악.",
-      "ui": ["filterBar", "dataTable"],
-      "filters": ["status", "platform", "team", "mineVsAll"],
-      "columns": ["name", "owner", "platforms", "status", "endAt", "budgetUsedPct", "championCount"],
+      "purpose": "권한 범위 내 프로젝트 운영 상태 파악 및 신규 생성 진입점. 상태 칩은 관리 수명주기이며 프로비저닝 진행 상태와 별개임을 명확히 한다.",
+      "ui": ["pageHeader", "filterBar", "dataTable", "emptyState"],
+      "header": {
+        "title": "프로젝트",
+        "description": "권한 범위 안의 운영 상태입니다. 상태 칩은 관리 수명주기이며 프로비저닝이 아닙니다.",
+        "actions": [{ "id": "create", "label": "생성 신청", "action": "nav:/projects/new" }]
+      },
+      "filters": [
+        {
+          "id": "status",
+          "type": "select",
+          "placeholder": "상태 전체",
+          "options": ["draft", "pending_approval", "active", "closed"],
+          "notes": "draft는 본인이 임시저장한 건만 노출(타인 draft는 서버에서 제외)"
+        },
+        {
+          "id": "platform",
+          "type": "select",
+          "placeholder": "플랫폼 전체",
+          "options": ["azure_ml", "azure_databricks"],
+          "notes": "프로젝트가 두 플랫폼을 모두 쓰면 둘 중 하나만 선택해도 매치"
+        },
+        {
+          "id": "mineVsAll",
+          "type": "toggle",
+          "visibleWhen": "canListAllProjects(user) — officer|dsp_admin",
+          "options": ["all", "mine"],
+          "default": "general은 필터 자체가 없고 항상 mine 범위로 고정; officer/admin은 default=all"
+        }
+      ],
+      "filterBehavior": "필터는 조합(AND) 적용, 클라이언트 재조회 없이 로컬 배열 필터(향후 서버 페이징 도입 시 query로 이전 필요). 필터 값은 URL 쿼리로 영속화되지 않음(뒤로가기 시 초기화) — 개선 후보.",
+      "columns": [
+        { "key": "name", "label": "프로젝트", "strong": true, "sortable": true },
+        { "key": "owner", "label": "오너", "sortable": false },
+        { "key": "platforms", "label": "플랫폼", "sortable": false },
+        { "key": "status", "label": "상태", "sortable": true },
+        { "key": "endAt", "label": "기한", "sortable": true, "notes": "지난 기한이면서 status=active인 행은 경고 스타일(예: 텍스트 danger 톤) 후보" },
+        { "key": "budgetUsedPct", "label": "예산 사용", "numeric": true, "sortable": true, "notes": "100% 초과 시 danger 톤 강조" },
+        { "key": "championCount", "label": "Champion", "numeric": true, "sortable": true }
+      ],
       "columnNotes": {
         "status": "Project.status(관리). 프로비저닝 롤업을 이 컬럼에 넣지 않는다."
       },
+      "sortDefault": "endAt asc(기한 임박 우선), 2차 정렬 name asc",
+      "rowInteraction": {
+        "click": "nav:/projects/:id (단, status=draft이면 nav:/projects/new?draft=:id — 임시저장 이어쓰기)",
+        "rowTone": "status=closed 행은 흐리게(dimmed) 표시해 활성 프로젝트와 구분"
+      },
+      "emptyState": {
+        "noResultsAfterFilter": "필터 조건에 맞는 프로젝트가 없습니다 + 필터 초기화 버튼",
+        "trueEmpty": "general 사용자가 소속 프로젝트가 하나도 없을 때: '아직 참여한 프로젝트가 없습니다' + 생성 신청/분석 요청 CTA"
+      },
+      "pagination": "MVP는 클라이언트 전체 목록(페이지네이션 없음). 프로젝트 수 증가 시 서버 페이징+무한스크롤 또는 페이지네이터 도입 후보(향후 과제).",
       "buttons": [
         { "id": "create", "label": "생성 신청", "action": "nav:/projects/new" },
         { "id": "rowOpen", "label": "열기", "action": "nav:/projects/:id" }
       ],
-      "scopeRule": "general=member projects only; officer|admin=all with toggle"
+      "scopeRule": "general=member projects only; officer|admin=all with toggle",
+      "accessibility": "테이블 행 클릭 외에 키보드 포커스+Enter로도 진입 가능해야 함(현재 마우스 클릭 핸들러만 있어 개선 필요)."
     },
     {
       "id": "projectCreate",
@@ -943,6 +1091,20 @@
       "route": "/admin/codes/:group",
       "purpose": "한 코드 그룹의 코드 테이블.",
       "ui": ["codeTable"],
+      "roles": ["dsp_admin"]
+    },
+    {
+      "id": "adminBatch",
+      "route": "/admin/batch",
+      "purpose": "범용 배치 스케줄 조회, 실패 건 재실행, 배치 활성/비활성 토글.",
+      "ui": ["dataTable", "historyModal"],
+      "roles": ["dsp_admin"]
+    },
+    {
+      "id": "adminUsage",
+      "route": "/admin/usage",
+      "purpose": "페이지뷰·API 호출 통계와 일별 추이, 상위 조회 페이지, API별 호출·응답시간·오류율.",
+      "ui": ["kpiRow", "lineChart", "barChart", "dataTable"],
       "roles": ["dsp_admin"]
     }
   ],

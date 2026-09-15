@@ -1,194 +1,47 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import ProjectSubnav from '../components/layout/ProjectSubnav.vue'
-import DsBanner from '../components/ui/DsBanner.vue'
 import DsButton from '../components/ui/DsButton.vue'
-import DsCard from '../components/ui/DsCard.vue'
-import DsChip from '../components/ui/DsChip.vue'
-import DsField from '../components/ui/DsField.vue'
-import DsInput from '../components/ui/DsInput.vue'
-import DsModal from '../components/ui/DsModal.vue'
 import DsPageHeader from '../components/ui/DsPageHeader.vue'
-import {
-  approvalStatus,
-  approvalStatusChip,
-  approvalType,
-  platformType,
-  projectStatus,
-  projectStatusChip,
-  provisionRollup,
-  provisionStatus,
-  provisionStatusChip,
-} from '../data/labels'
-import { formatDate, formatWon } from '../lib/format'
-import { canOpenCloud, canRetryProvisioning, canWriteProject } from '../lib/permissions'
-import { useAuthStore } from '../stores/auth'
 import { useDspStore } from '../stores/dsp'
 
 const route = useRoute()
-const auth = useAuthStore()
 const dsp = useDspStore()
 const id = computed(() => route.params.id)
 const project = computed(() => dsp.projectById(id.value))
-const teamCount = computed(() => dsp.members.filter((m) => m.projectId === id.value).length)
-const modelCount = computed(() => dsp.models.filter((m) => m.projectId === id.value).length)
-const items = computed(() => dsp.provisions.filter((p) => p.projectId === id.value))
-const history = computed(() => dsp.approvals.filter((a) => a.payloadRef === id.value))
-const pendingClose = computed(() =>
-  history.value.some((a) => a.type === 'project_close' && a.status === 'pending'),
-)
-const pendingUpgrade = computed(() =>
-  history.value.filter((a) => a.type === 'compute_upgrade' && a.status === 'pending'),
-)
-const rollup = computed(() => dsp.provisionRollup(id.value))
-const budgetOpen = ref(false)
-const newBudget = ref('')
-
-function openCloud() {
-  const ok = items.value.find((p) => p.status === 'succeeded')
-  if (ok) window.open(`https://ml.azure.com/?ws=${ok.cloudResourceId}`, '_blank', 'noreferrer')
-}
+const tasks = [
+  { id: 'task-1', title: '판매 데이터 품질 검증', state: '진행 중', owner: '김민준', tags: ['데이터', 'P1'] },
+  { id: 'task-2', title: '수요예측 v1.6 비교 평가', state: '할 일', owner: '이서준', tags: ['모델'] },
+  { id: 'task-3', title: '운영 엔드포인트 점검', state: '완료', owner: '박지은', tags: ['운영'] },
+  { id: 'task-4', title: '9월 배포 승인 준비', state: '할 일', owner: '김민준', tags: ['릴리스'] },
+]
 </script>
 
 <template>
   <div v-if="project">
     <DsPageHeader :title="project.name" :description="project.goal">
-      <template #actions>
-        <DsButton
-          v-if="canWriteProject(auth.user, project, dsp.members, 'manageMembersLimited')"
-          variant="secondary"
-          :to="`/projects/${project.id}/team`"
-        >
-          팀 편집
-        </DsButton>
-        <DsButton
-          v-if="canWriteProject(auth.user, project, dsp.members, 'budgetDeadlineSubmit')"
-          variant="ghost"
-          @click="newBudget = String(project.budgetAmount); budgetOpen = true"
-        >
-          예산변경 상신
-        </DsButton>
-        <DsButton
-          v-if="canOpenCloud(auth.user, project, dsp.provisions, dsp.members)"
-          variant="ghost"
-          @click="openCloud"
-        >
-          워크스페이스에서 열기
-        </DsButton>
-        <DsButton
-          v-if="canWriteProject(auth.user, project, dsp.members, 'closeProjectSubmit')"
-          variant="danger"
-          @click="dsp.submitClose(project.id)"
-        >
-          종료 신청
-        </DsButton>
-      </template>
     </DsPageHeader>
     <ProjectSubnav :project-id="project.id" />
 
-    <div class="chips">
-      <DsChip :tone="projectStatusChip[project.status]">{{ projectStatus[project.status] }}</DsChip>
-      <DsChip v-if="rollup !== 'none'" :tone="rollup === 'failed' ? 'danger' : rollup === 'succeeded' ? 'success' : 'info'">
-        {{ provisionRollup[rollup] }}
-      </DsChip>
-    </div>
-
-    <DsBanner v-if="pendingClose" tone="warning">종료 품의가 진행 중입니다. 승인 전까지 프로젝트는 운영중으로 유지됩니다.</DsBanner>
-    <DsBanner v-if="pendingUpgrade.length" tone="warning">
-      컴퓨팅 상향 품의가 {{ pendingUpgrade.length }}건 대기 중입니다. 프로젝트 상태는 운영중 그대로입니다.
-      <template #action>
-        <DsButton variant="secondary" :to="`/projects/${project.id}/resources`">리소스</DsButton>
-      </template>
-    </DsBanner>
-    <DsBanner v-if="rollup === 'failed'" tone="danger">
-      프로비저닝 실패 항목이 있습니다. 프로젝트 상태는 운영중 그대로입니다.
-      <template v-if="canRetryProvisioning(auth.user)" #action>
-        <DsButton
-          variant="secondary"
-          @click="items.filter((i) => i.status === 'failed').forEach((i) => dsp.retryProvisioning(i.id))"
-        >
-          재시도
-        </DsButton>
-      </template>
-    </DsBanner>
-
-    <div class="two">
-      <DsCard>
-        <template #title>정의</template>
-        <dl class="ds-dl">
-          <div><dt>오너</dt><dd>{{ dsp.userById(project.ownerUserId)?.name }}</dd></div>
-          <div><dt>배경</dt><dd>{{ project.background }}</dd></div>
-          <div><dt>기술 스택</dt><dd>{{ (project.techStack || []).join(', ') || '—' }}</dd></div>
-          <div><dt>기간</dt><dd>{{ formatDate(project.startAt) }} – {{ formatDate(project.endAt) }}</dd></div>
-          <div><dt>예산</dt><dd class="tabular">{{ formatWon(project.budgetAmount) }} · 사용 {{ dsp.budgetUsedPct(project) }}%</dd></div>
-          <div><dt>플랫폼</dt><dd>{{ project.platforms.map((p) => platformType[p]).join(', ') }}</dd></div>
-          <div><dt>팀</dt><dd>{{ teamCount }}명</dd></div>
-          <div><dt>모델</dt><dd>{{ modelCount }}개</dd></div>
-        </dl>
-      </DsCard>
-      <DsCard>
-        <template #title>타임라인</template>
-        <ol class="tl">
-          <li v-for="a in history" :key="a.id">
-            <div>
-              <span class="ds-body-strong">{{ approvalType[a.type] }}</span>
-              <DsChip :tone="approvalStatusChip[a.status]">{{ approvalStatus[a.status] }}</DsChip>
-            </div>
-            <p class="ds-meta">{{ dsp.userById(a.requesterId)?.name }} · {{ formatDate(a.createdAt) }}</p>
-          </li>
-          <li v-for="p in items" :key="p.id">
-            <div>
-              <span class="ds-body-strong">{{ platformType[p.platform] }} {{ p.kind === 'compute_upgrade' ? '컴퓨팅 상향' : '프로비저닝' }}</span>
-              <DsChip :tone="provisionStatusChip[p.status]">{{ provisionStatus[p.status] }}</DsChip>
-            </div>
-            <p class="ds-meta">{{ p.cloudResourceId || p.errorMessage || '부가 작업' }}</p>
-          </li>
-        </ol>
-      </DsCard>
-    </div>
-
-    <DsModal v-if="budgetOpen" title="예산 변경 상신" size="sm" @close="budgetOpen = false">
-      <DsField label="새 예산 (KRW)">
-        <DsInput v-model="newBudget" type="number" width="full" />
-      </DsField>
-      <template #footer>
-        <DsButton variant="ghost" @click="budgetOpen = false">취소</DsButton>
-        <DsButton
-          variant="primary"
-          @click="dsp.submitBudgetChange(project.id, newBudget); budgetOpen = false"
-        >
-          상신
-        </DsButton>
-      </template>
-    </DsModal>
+    <section class="work-board">
+      <header class="board-head"><h2>작업 보드</h2><DsButton variant="secondary">작업 추가</DsButton></header>
+      <div class="board-columns">
+        <div v-for="state in ['할 일', '진행 중', '완료']" :key="state" class="board-column"><h3>{{ state }} <span>{{ tasks.filter((task) => task.state === state).length }}</span></h3><article v-for="task in tasks.filter((item) => item.state === state)" :key="task.id" class="task"><strong>{{ task.title }}</strong><div class="task-meta"><span>{{ task.owner }}</span><span>{{ task.tags.join(' · ') }}</span></div></article></div>
+      </div>
+    </section>
   </div>
   <p v-else class="ds-body">프로젝트를 찾을 수 없습니다.</p>
 </template>
 
 <style scoped>
-.chips {
-  display: flex;
-  gap: var(--ds-space-2);
-  margin-bottom: var(--ds-space-5);
-}
-
-.two {
-  display: grid;
-  gap: var(--ds-section-gap);
-  grid-template-columns: 1fr 1fr;
-  margin-top: var(--ds-section-gap);
-}
-
-.tl {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-space-4);
-}
-
-.tl li div {
-  align-items: center;
-  display: flex;
-  gap: var(--ds-space-2);
-}
+.work-board { margin-bottom: var(--ds-section-gap); }
+.board-head { align-items: flex-start; display: flex; justify-content: space-between; margin-bottom: var(--ds-space-3); }
+.board-head h2 { font-size: var(--ds-font-title-sm); margin: 0 0 var(--ds-space-1); }
+.board-columns { display: grid; gap: var(--ds-space-3); grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.board-column { background: var(--ds-canvas-subtle); border: 1px solid var(--ds-border-subtle); border-radius: var(--ds-radius-lg); min-height: 170px; padding: var(--ds-space-3); }
+.board-column h3 { align-items: center; display: flex; font-size: var(--ds-font-label); justify-content: space-between; margin: 0 0 var(--ds-space-3); }
+.board-column h3 span { color: var(--ds-text-secondary); font-size: var(--ds-font-meta); }
+.task { background: var(--ds-surface); border: 1px solid var(--ds-border); border-radius: var(--ds-radius-md); display: flex; flex-direction: column; gap: var(--ds-space-3); margin-bottom: var(--ds-space-2); padding: var(--ds-space-3); }
+.task-meta { color: var(--ds-text-secondary); display: flex; font-size: var(--ds-font-meta); justify-content: space-between; }
 </style>

@@ -53,10 +53,25 @@ export const useDspStore = defineStore('dsp', () => {
   const notifications = computed(() => state.value.notifications)
   const thresholdTemplates = computed(() => state.value.thresholdTemplates)
   const approvalLines = computed(() => state.value.approvalLines)
+  const permissions = computed(() => state.value.permissions)
   const codes = computed(() => state.value.codes)
   const computeClasses = computed(() => state.value.computeClasses)
   const supportPosts = computed(() => state.value.supportPosts)
   const analysisRequests = computed(() => state.value.analysisRequests)
+  const batchJobs = computed(() => state.value.batchJobs)
+  const batchRuns = computed(() => state.value.batchRuns)
+  const usageDaily = computed(() => state.value.usageDaily)
+  const usageByUser = computed(() => state.value.usageByUser)
+  const usageByPage = computed(() => state.value.usageByPage)
+  const usageByApi = computed(() => state.value.usageByApi)
+
+  function usageSummary() {
+    return {
+      totalPageViews: state.value.usageByUser.reduce((sum, u) => sum + u.pageViews, 0),
+      totalApiCalls: state.value.usageByUser.reduce((sum, u) => sum + u.apiCalls, 0),
+      activeUserCount: state.value.usageByUser.length,
+    }
+  }
 
   function userById(id) {
     return state.value.users.find((u) => u.id === id) || null
@@ -70,8 +85,16 @@ export const useDspStore = defineStore('dsp', () => {
     return state.value.models.find((m) => m.id === id) || null
   }
 
+  function datasetById(id) {
+    return state.value.datasets.find((d) => d.id === id) || null
+  }
+
   function approvalById(id) {
     return state.value.approvals.find((a) => a.id === id) || null
+  }
+
+  function permissionById(id) {
+    return state.value.permissions.find((p) => p.id === id) || null
   }
 
   function visibleProjects() {
@@ -135,22 +158,33 @@ export const useDspStore = defineStore('dsp', () => {
     }
   }
 
+  function attentionSeverity(m) {
+    if (m.lastMonitor === 'fail') return 3
+    if ((m.driftScore ?? 0) >= 0.25) return 2
+    if (m.championHealth === 'at_risk') return 1
+    return 0
+  }
+
   function attentionModels() {
-    return visibleModels().filter(
-      (m) => m.lastMonitor === 'fail' || m.championHealth === 'at_risk' || (m.driftScore ?? 0) >= 0.25,
-    )
+    return visibleModels()
+      .filter(
+        (m) => m.lastMonitor === 'fail' || m.championHealth === 'at_risk' || (m.driftScore ?? 0) >= 0.25,
+      )
+      .sort((a, b) => attentionSeverity(b) - attentionSeverity(a))
   }
 
   function myPendingApprovals() {
     const auth = useAuthStore()
     const user = auth.user
     if (!user) return []
-    return state.value.approvals.filter((a) => {
-      if (a.status !== 'pending') return false
-      if (isApprover(user) && a.approverId === user.id) return true
-      if (a.requesterId === user.id) return true
-      return false
-    })
+    return state.value.approvals
+      .filter((a) => {
+        if (a.status !== 'pending') return false
+        if (isApprover(user) && a.approverId === user.id) return true
+        if (a.requesterId === user.id) return true
+        return false
+      })
+      .sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1))
   }
 
   function unreadNotifications() {
@@ -261,6 +295,7 @@ export const useDspStore = defineStore('dsp', () => {
         return { ok: false }
       }
       Object.assign(existing, payload)
+      syncDraftMembers(draftId, form.members, auth.user.id)
       if (!silent) ui.toast('임시저장했습니다.')
       return { ok: true, id: existing.id }
     }
@@ -280,19 +315,25 @@ export const useDspStore = defineStore('dsp', () => {
       addedBy: auth.user.id,
       addedAt: nowIso(),
     })
-    for (const member of form.members) {
-      if (!member.userId || member.userId === auth.user.id) continue
-      if (state.value.members.some((m) => m.projectId === id && m.userId === member.userId)) continue
+    syncDraftMembers(id, form.members, auth.user.id)
+    if (!silent) ui.toast('임시저장했습니다.')
+    return { ok: true, id }
+  }
+
+  function syncDraftMembers(projectId, members, addedBy) {
+    state.value.members = state.value.members.filter((member) => member.projectId !== projectId || member.projectRole === 'owner')
+    const seen = new Set()
+    for (const member of members || []) {
+      if (!member.userId || member.userId === addedBy || seen.has(member.userId)) continue
+      seen.add(member.userId)
       state.value.members.push({
-        projectId: id,
+        projectId,
         userId: member.userId,
-        projectRole: member.projectRole,
-        addedBy: auth.user.id,
+        projectRole: member.projectRole || 'member',
+        addedBy,
         addedAt: nowIso(),
       })
     }
-    if (!silent) ui.toast('임시저장했습니다.')
-    return { ok: true, id }
   }
 
   function submitCreateApproval(form, draftId) {
@@ -711,6 +752,38 @@ export const useDspStore = defineStore('dsp', () => {
     item.status = 'queued'
     item.errorMessage = null
     ui.toast('프로비저닝을 다시 대기열에 넣었습니다.')
+  }
+
+  function batchJobById(id) {
+    return state.value.batchJobs.find((j) => j.id === id) || null
+  }
+
+  function batchRunsFor(jobId) {
+    return state.value.batchRuns
+      .filter((r) => r.jobId === jobId)
+      .sort((a, b) => (a.startedAt < b.startedAt ? 1 : -1))
+  }
+
+  function setBatchJobEnabled(jobId, enabled) {
+    if (!requireAdmin()) return { ok: false }
+    const job = batchJobById(jobId)
+    if (!job) return { ok: false }
+    job.enabled = enabled
+    useUiStore().toast(enabled ? '배치를 활성화했습니다.' : '배치를 비활성화했습니다.')
+    return { ok: true }
+  }
+
+  function retryBatchJob(jobId) {
+    if (!requireAdmin()) return { ok: false }
+    const job = batchJobById(jobId)
+    if (!job || job.lastStatus !== 'failed') return { ok: false }
+    const now = nowIso()
+    job.lastStatus = 'running'
+    job.lastRunAt = now
+    job.lastError = null
+    state.value.batchRuns.unshift({ id: nid('run'), jobId, startedAt: now, finishedAt: null, status: 'running' })
+    useUiStore().toast('배치를 다시 실행합니다.')
+    return { ok: true }
   }
 
   function addMember(projectId, userId, role) {
@@ -1251,7 +1324,7 @@ export const useDspStore = defineStore('dsp', () => {
       project: visibleProjects().filter((p) => p.name.toLowerCase().includes(q) || p.goal.includes(query)),
       model: visibleModels().filter((m) => `${m.name} ${m.version}`.toLowerCase().includes(q)),
       dataset: state.value.datasets.filter(
-        (d) => vis.has(d.projectId) && (d.name.toLowerCase().includes(q) || d.ref.toLowerCase().includes(q)),
+        (d) => d.name.toLowerCase().includes(q) || d.ref.toLowerCase().includes(q),
       ),
       approval: state.value.approvals.filter((a) => {
         const target = approvalTarget(a)
@@ -1441,6 +1514,50 @@ export const useDspStore = defineStore('dsp', () => {
     return { ok: true }
   }
 
+  function savePermission(payload) {
+    if (!requireAdmin()) return { ok: false }
+    const ui = useUiStore()
+    const name = payload.name?.trim()
+    if (!name) {
+      ui.toast('권한 이름을 입력하세요.', 'danger')
+      return { ok: false }
+    }
+    const pageKeys = Array.from(new Set(payload.pageKeys || []))
+    const apiKeys = Array.from(new Set(payload.apiKeys || []))
+    if (payload.id) {
+      const existing = permissionById(payload.id)
+      if (!existing) return { ok: false }
+      Object.assign(existing, { name, description: payload.description?.trim() || '', pageKeys, apiKeys })
+      ui.toast('권한을 저장했습니다.')
+      return { ok: true, id: existing.id }
+    }
+    if (state.value.permissions.some((p) => p.name === name)) {
+      ui.toast('같은 이름의 권한이 이미 있습니다.', 'danger')
+      return { ok: false }
+    }
+    const id = nid('perm')
+    state.value.permissions.push({
+      id,
+      name,
+      description: payload.description?.trim() || '',
+      pageKeys,
+      apiKeys,
+      enabled: true,
+      createdAt: nowIso(),
+    })
+    ui.toast('권한을 추가했습니다.')
+    return { ok: true, id }
+  }
+
+  function setPermissionEnabled(id, enabled) {
+    if (!requireAdmin()) return { ok: false }
+    const existing = permissionById(id)
+    if (!existing) return { ok: false }
+    existing.enabled = enabled
+    useUiStore().toast(enabled ? '권한을 활성했습니다.' : '권한을 비활성했습니다.')
+    return { ok: true }
+  }
+
   function reset() {
     state.value = deepClone(createSeed())
   }
@@ -1466,15 +1583,25 @@ export const useDspStore = defineStore('dsp', () => {
     notifications,
     thresholdTemplates,
     approvalLines,
+    permissions,
     codes,
     computeClasses,
     supportPosts,
     analysisRequests,
+    batchJobs,
+    batchRuns,
+    usageDaily,
+    usageByUser,
+    usageByPage,
+    usageByApi,
+    usageSummary,
     settings: computed(() => state.value.settings),
     userById,
     projectById,
     modelById,
+    datasetById,
     approvalById,
+    permissionById,
     provisionById,
     visibleProjects,
     visibleModels,
@@ -1500,6 +1627,10 @@ export const useDspStore = defineStore('dsp', () => {
     submitClose,
     submitBudgetChange,
     retryProvisioning,
+    batchJobById,
+    batchRunsFor,
+    setBatchJobEnabled,
+    retryBatchJob,
     addMember,
     changeMemberRole,
     removeMember,
@@ -1524,6 +1655,8 @@ export const useDspStore = defineStore('dsp', () => {
     saveApprovalLine,
     saveCode,
     setCodeEnabled,
+    savePermission,
+    setPermissionEnabled,
     supportPostById,
     visibleSupportPosts,
     pinnedNotices,

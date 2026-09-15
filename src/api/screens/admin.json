@@ -128,6 +128,112 @@
           "body": { "enabled": "boolean" }
         }
       ]
+    },
+    {
+      "id": "adminBatch",
+      "route": "/admin/batch",
+      "view": "src/views/admin/AdminBatchJobsView.vue",
+      "purpose": "범용 배치 작업 스케줄·실행 상태 조회, 실패 건 재실행, 활성/비활성 토글.",
+      "auth": true,
+      "roles": ["dsp_admin"],
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "list",
+          "method": "GET",
+          "path": "/api/v1/admin/batch-jobs",
+          "response": {
+            "items": [
+              {
+                "id": "string",
+                "name": "string",
+                "description": "string",
+                "schedule": "string(cron)",
+                "enabled": "boolean",
+                "lastRunAt": "string | null",
+                "lastStatus": "queued | running | succeeded | failed",
+                "lastDurationSec": "number | null",
+                "lastError": "string | null"
+              }
+            ]
+          }
+        },
+        {
+          "id": "runs",
+          "method": "GET",
+          "path": "/api/v1/admin/batch-jobs/:id/runs",
+          "why": "재실행 이력 모달",
+          "response": {
+            "items": [
+              { "id": "string", "startedAt": "string", "finishedAt": "string | null", "status": "string", "message": "string | null" }
+            ]
+          }
+        },
+        {
+          "id": "retry",
+          "method": "POST",
+          "path": "/api/v1/admin/batch-jobs/:id/retry",
+          "why": "lastStatus=failed 인 건만 재실행 가능",
+          "roles": ["dsp_admin"]
+        },
+        {
+          "id": "setEnabled",
+          "method": "POST",
+          "path": "/api/v1/admin/batch-jobs/:id/enabled",
+          "body": { "enabled": "boolean" },
+          "roles": ["dsp_admin"]
+        }
+      ]
+    },
+    {
+      "id": "adminUsage",
+      "route": "/admin/usage",
+      "view": "src/views/admin/AdminUsageStatsView.vue",
+      "purpose": "사용자별 페이지뷰·API 호출 통계, 일별 추이, 상위 조회 페이지.",
+      "auth": true,
+      "roles": ["dsp_admin"],
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "summary",
+          "method": "GET",
+          "path": "/api/v1/admin/usage/summary",
+          "response": {
+            "totalPageViews": "number",
+            "totalApiCalls": "number",
+            "activeUserCount": "number"
+          }
+        },
+        {
+          "id": "daily",
+          "method": "GET",
+          "path": "/api/v1/admin/usage/daily",
+          "why": "일별 추이 라인차트",
+          "response": {
+            "items": [{ "date": "string", "pageViews": "number", "apiCalls": "number" }]
+          }
+        },
+        {
+          "id": "byApi",
+          "method": "GET",
+          "path": "/api/v1/admin/usage/apis",
+          "why": "API별 호출 통계 테이블(사용자별 통계보다 우선)",
+          "response": {
+            "items": [
+              { "method": "string", "path": "string", "calls": "number", "avgLatencyMs": "number", "errorRate": "number" }
+            ]
+          }
+        },
+        {
+          "id": "byPage",
+          "method": "GET",
+          "path": "/api/v1/admin/usage/pages",
+          "why": "상위 조회 페이지 바차트",
+          "response": {
+            "items": [{ "path": "string", "label": "string", "views": "number" }]
+          }
+        }
+      ]
     }
   ]
 }

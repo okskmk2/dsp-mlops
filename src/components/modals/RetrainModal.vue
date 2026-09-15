@@ -13,7 +13,11 @@ const dsp = useDspStore()
 const ui = useUiStore()
 const model = computed(() => dsp.modelById(ui.retrainModelId))
 const jobs = computed(() => dsp.jobs.filter((j) => j.projectId === model.value?.projectId))
-const datasets = computed(() => dsp.datasets.filter((d) => d.projectId === model.value?.projectId))
+const datasets = computed(() => {
+  const jobIds = new Set(jobs.value.map((j) => j.id))
+  const datasetIds = new Set(dsp.lineageEdges.filter((e) => jobIds.has(e.to)).map((e) => e.from))
+  return dsp.datasets.filter((d) => datasetIds.has(d.id))
+})
 
 const form = reactive({
   reason: '',

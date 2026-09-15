@@ -1,14 +1,23 @@
 <script setup>
 import DsEmpty from './DsEmpty.vue'
 
-defineProps({
+const props = defineProps({
   columns: { type: Array, required: true },
   rows: { type: Array, default: () => [] },
   rowKey: { type: String, default: 'id' },
   emptyTitle: { type: String, default: '표시할 항목이 없습니다' },
+  sortKey: { type: String, default: '' },
+  sortDir: { type: String, default: 'asc' },
+  rowClass: { type: Function, default: null },
 })
 
-defineEmits(['row-click'])
+const emit = defineEmits(['row-click', 'sort'])
+
+function onHeaderClick(col) {
+  if (!col.sortable) return
+  const dir = props.sortKey === col.key && props.sortDir === 'asc' ? 'desc' : 'asc'
+  emit('sort', { key: col.key, dir })
+}
 </script>
 
 <template>
@@ -19,10 +28,12 @@ defineEmits(['row-click'])
           <th
             v-for="col in columns"
             :key="col.key"
-            :class="{ 'is-num': col.numeric }"
+            :class="{ 'is-num': col.numeric, 'is-sortable': col.sortable }"
             :style="col.width ? { width: col.width } : undefined"
+            @click="onHeaderClick(col)"
           >
             {{ col.label }}
+            <span v-if="col.sortable" class="sort-indicator">{{ sortKey === col.key ? (sortDir === 'asc' ? '▲' : '▼') : '' }}</span>
           </th>
         </tr>
       </thead>
@@ -37,7 +48,10 @@ defineEmits(['row-click'])
             v-for="row in rows"
             :key="row[rowKey]"
             class="is-click"
+            :class="rowClass ? rowClass(row) : ''"
+            tabindex="0"
             @click="$emit('row-click', row)"
+            @keydown.enter="$emit('row-click', row)"
           >
           <td
             v-for="col in columns"
@@ -80,6 +94,17 @@ defineEmits(['row-click'])
   white-space: nowrap;
 }
 
+.ds-table th.is-sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sort-indicator {
+  display: inline-block;
+  font-size: 10px;
+  margin-left: 4px;
+}
+
 .ds-table td {
   border-bottom: 1px solid var(--ds-border-subtle);
   font-size: var(--ds-font-label);
@@ -104,5 +129,19 @@ defineEmits(['row-click'])
 
 .ds-table tbody tr.is-click {
   cursor: pointer;
+}
+
+.ds-table tbody tr.is-click:focus-visible {
+  outline: 2px solid var(--ds-focus-ring, #2563eb);
+  outline-offset: -2px;
+}
+
+.ds-table tbody tr.is-dimmed td {
+  color: var(--ds-text-secondary);
+  opacity: 0.65;
+}
+
+.ds-table tbody tr.is-warn td {
+  color: var(--ds-danger);
 }
 </style>

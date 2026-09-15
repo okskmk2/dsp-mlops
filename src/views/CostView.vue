@@ -74,6 +74,11 @@ const platformShare = computed(() => {
   }))
 })
 
+const projectRows = computed(() => projects.value.map((project) => {
+  const amount = records.value.filter((record) => record.projectId === project.id).reduce((sum, record) => sum + record.amount, 0)
+  return { id: project.id, label: project.name, amount, budget: project.budgetAmount || 0 }
+}).filter((row) => row.amount || row.budget))
+
 const idleHint = computed(() => rank.value.find((r) => r.amount < (r.budget || 1) * 0.1))
 
 function exportCsv() {
@@ -88,12 +93,12 @@ function exportCsv() {
   a.click()
 }
 
-const columns = computed(() => [
-  { key: 'label', label: groupBy.value === 'platform' ? '플랫폼' : '프로젝트', strong: true },
+const columns = [
+  { key: 'label', label: '프로젝트', strong: true },
   { key: 'amount', label: '실적', numeric: true },
   { key: 'budget', label: '예산', numeric: true },
   { key: 'used', label: '사용률', numeric: true },
-])
+]
 </script>
 
 <template>
@@ -134,18 +139,14 @@ const columns = computed(() => [
     </DsCard>
   </div>
 
-  <DsCard class="ds-follow">
-    <template #title>예산 대비 실적</template>
-    <DsTable
-      :columns="columns"
-      :rows="rank"
-      @row-click="(r) => groupBy === 'team' && router.push(`/projects/${r.id}/cost`)"
-    >
+  <section class="project-group">
+    <header class="project-header"><div><h2>프로젝트별 비용</h2><span>{{ projectRows.length }}개 프로젝트</span></div><strong>예산 대비 실적</strong></header>
+    <DsTable :columns="columns" :rows="projectRows" @row-click="(r) => router.push(`/projects/${r.id}/cost`)">
       <template #amount="{ row }">{{ formatWon(row.amount) }}</template>
       <template #budget="{ row }">{{ formatWon(row.budget) }}</template>
       <template #used="{ row }">{{ row.budget ? formatPct((row.amount / row.budget) * 100, 1) : '—' }}</template>
     </DsTable>
-  </DsCard>
+  </section>
 </template>
 
 <style scoped>
@@ -154,4 +155,10 @@ const columns = computed(() => [
   gap: var(--ds-section-gap);
   grid-template-columns: 1.4fr 1fr;
 }
+
+.project-group { border-top: 1px solid var(--ds-border); margin-top: var(--ds-section-gap); padding-top: var(--ds-space-4); }
+.project-header { align-items: baseline; display: flex; justify-content: space-between; margin-bottom: var(--ds-space-3); }
+.project-header div { align-items: baseline; display: flex; gap: var(--ds-space-3); }
+.project-header h2 { font-size: var(--ds-font-title-sm); margin: 0; }
+.project-header span, .project-header strong { color: var(--ds-text-secondary); font-size: var(--ds-font-meta); font-weight: 400; }
 </style>

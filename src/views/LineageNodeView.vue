@@ -15,16 +15,24 @@ const depth = ref(2)
 
 const vis = computed(() => new Set(dsp.visibleProjects().map((p) => p.id)))
 
+const jobs = computed(() => dsp.jobs.filter((d) => vis.value.has(d.projectId)))
+const models = computed(() => dsp.visibleModels().map((d) => ({
+  ...d,
+  kind: 'modelVersion',
+  label: `${d.name} ${d.version}`,
+  projectName: dsp.projectById(d.projectId)?.name,
+})))
+const includedIds = computed(() => new Set([...jobs.value.map((j) => j.id), ...models.value.map((m) => m.id)]))
+
 const nodes = computed(() => {
-  const ds = dsp.datasets.filter((d) => vis.value.has(d.projectId)).map((d) => ({ ...d, kind: 'dataset' }))
-  const jobs = dsp.jobs.filter((d) => vis.value.has(d.projectId)).map((d) => ({ ...d, kind: 'job' }))
-  const models = dsp.visibleModels().map((d) => ({
-    ...d,
-    kind: 'modelVersion',
-    label: `${d.name} ${d.version}`,
-  }))
-  const eps = dsp.endpoints.filter((d) => vis.value.has(d.projectId)).map((d) => ({ ...d, kind: 'endpoint' }))
-  return [...ds, ...jobs, ...models, ...eps]
+  const ds = dsp.datasets
+    .filter((d) => dsp.lineageEdges.some((e) => e.from === d.id && includedIds.value.has(e.to)))
+    .map((d) => ({ ...d, kind: 'dataset' }))
+  const jobNodes = jobs.value.map((d) => ({ ...d, kind: 'job' }))
+  const eps = dsp.endpoints
+    .filter((e) => dsp.lineageEdges.some((edge) => edge.to === e.id && includedIds.value.has(edge.from)))
+    .map((e) => ({ ...e, kind: 'endpoint' }))
+  return [...ds, ...jobNodes, ...models.value, ...eps]
 })
 
 const node = computed(() => nodes.value.find((n) => n.id === route.params.nodeId) || null)

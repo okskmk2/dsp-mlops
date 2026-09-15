@@ -1,10 +1,11 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import DsButton from '../components/ui/DsButton.vue'
 import DsChip from '../components/ui/DsChip.vue'
 import DsEmpty from '../components/ui/DsEmpty.vue'
 import DsPageHeader from '../components/ui/DsPageHeader.vue'
+import DsTabs from '../components/ui/DsTabs.vue'
 import {
   notificationSeverityChip,
   notificationSeverityLabel,
@@ -13,9 +14,31 @@ import {
 import { formatDateTime } from '../lib/format'
 import { useDspStore } from '../stores/dsp'
 
+// 헤더의 결재함·모니터링 진입점을 대신해 여기서 유형별로 구분한다.
+const segments = [
+  { id: 'all', label: '전체', types: null },
+  { id: 'approval', label: '결재', types: ['approval_done'] },
+  { id: 'monitoring', label: '모니터링', types: ['monitor_fail', 'drift_alert', 'champion_at_risk'] },
+  { id: 'resource', label: '리소스', types: ['provision_done', 'provision_failed', 'budget_80', 'budget_100'] },
+  { id: 'model', label: '모델', types: ['model_stage_change'] },
+  { id: 'support', label: '지원', types: ['notice_published', 'analysis_request_submitted', 'analysis_request_updated'] },
+]
+
 const dsp = useDspStore()
 const router = useRouter()
+const segment = ref('all')
 const items = computed(() => dsp.myNotifications())
+
+function countOf(types) {
+  return types ? items.value.filter((n) => types.includes(n.type)).length : items.value.length
+}
+
+const tabs = computed(() => segments.map((s) => ({ id: s.id, label: `${s.label} ${countOf(s.types)}` })))
+
+const filtered = computed(() => {
+  const types = segments.find((s) => s.id === segment.value)?.types
+  return types ? items.value.filter((n) => types.includes(n.type)) : items.value
+})
 
 function severity(type) {
   return notificationSeverityChip[type] || 'info'
@@ -28,13 +51,14 @@ function goto(n) {
 </script>
 
 <template>
-  <DsPageHeader title="알림" description="운영 이벤트입니다. 모델 스테이지가 Draft·Challenger·Champion으로 바뀌면 프로젝트 멤버 전원에게 갑니다.">
+  <DsPageHeader title="알림" description="운영 이벤트입니다. 결재 대기, 모니터링 경보를 포함한 모든 알림을 여기서 확인합니다.">
     <template #actions>
       <DsButton variant="secondary" @click="dsp.markAllRead()">모두 읽음</DsButton>
     </template>
   </DsPageHeader>
-  <ol v-if="items.length" class="list">
-    <li v-for="n in items" :key="n.id" :class="{ unread: !n.read }">
+  <DsTabs v-model="segment" :tabs="tabs" />
+  <ol v-if="filtered.length" class="list">
+    <li v-for="n in filtered" :key="n.id" :class="{ unread: !n.read }">
       <button type="button" @click="goto(n)">
         <span class="meta-row">
           <DsChip :tone="severity(n.type)">{{ notificationSeverityLabel[severity(n.type)] }}</DsChip>
@@ -54,6 +78,7 @@ function goto(n) {
   border: 1px solid var(--ds-border);
   display: flex;
   flex-direction: column;
+  margin-top: var(--ds-space-4);
 }
 
 .list li {

@@ -14,9 +14,13 @@ import { useUiStore } from '../stores/ui'
 
 const dsp = useDspStore()
 const ui = useUiStore()
-const modelId = ref(dsp.visibleModels().find((m) => m.stage === 'champion')?.id || '')
+const firstModel = dsp.visibleModels().find((m) => m.stage === 'champion') || dsp.visibleModels()[0]
+const projectId = ref(firstModel?.projectId || '')
+const modelId = ref(firstModel?.id || '')
 const feature = ref('all')
 
+const projectOptions = computed(() => dsp.visibleProjects().map((project) => ({ value: project.id, label: project.name })))
+const projectModels = computed(() => dsp.visibleModels().filter((modelItem) => modelItem.projectId === projectId.value))
 const model = computed(() => dsp.modelById(modelId.value))
 const seriesRows = computed(() => dsp.driftSeries.filter((d) => d.modelId === modelId.value))
 const events = computed(() =>
@@ -33,20 +37,37 @@ const chartSeries = computed(() => {
   const picked = feature.value === 'all' ? all : all.filter((s) => s.key === feature.value)
   return picked.map((s) => ({ label: s.label, values: rows.map((r) => r[s.key]) }))
 })
+
+function selectProject(id) {
+  projectId.value = id
+  modelId.value = projectModels.value.find((modelItem) => modelItem.stage === 'champion')?.id || projectModels.value[0]?.id || ''
+}
 </script>
 
 <template>
   <DsPageHeader title="드리프트" description="Champion 자격 경고와 추이입니다.">
     <template #actions>
       <DsSelect
+        :model-value="projectId"
+        :options="projectOptions"
+        placeholder="프로젝트 선택"
+        width="lg"
+        @update:model-value="selectProject"
+      />
+      <DsSelect
         v-model="modelId"
-        :options="dsp.visibleModels().map((m) => ({ value: m.id, label: `${m.name} ${m.version}` }))"
+        :options="projectModels.map((m) => ({ value: m.id, label: `${m.name} ${m.version}` }))"
         placeholder=""
         width="lg"
       />
       <DsButton v-if="model" variant="secondary" @click="ui.retrainModelId = model.id">재학습</DsButton>
     </template>
   </DsPageHeader>
+
+  <header class="project-context" v-if="model">
+    <div><h2>{{ dsp.projectById(model.projectId)?.name }}</h2><span>선택한 프로젝트의 모델 드리프트</span></div>
+    <strong>{{ projectModels.length }}개 모델</strong>
+  </header>
 
   <DsCard v-if="model?.championHealth === 'at_risk'" class="ds-mb-section">
     <template #title>Champion 위험</template>
@@ -102,5 +123,31 @@ const chartSeries = computed(() => {
 <style scoped>
 .toolbar {
   margin-bottom: var(--ds-space-4);
+}
+
+.project-context {
+  align-items: baseline;
+  border-top: 1px solid var(--ds-border);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--ds-space-4);
+  padding-top: var(--ds-space-4);
+}
+
+.project-context div {
+  align-items: baseline;
+  display: flex;
+  gap: var(--ds-space-3);
+}
+
+.project-context h2 {
+  font-size: var(--ds-font-title-sm);
+  margin: 0;
+}
+
+.project-context span, .project-context strong {
+  color: var(--ds-text-secondary);
+  font-size: var(--ds-font-meta);
+  font-weight: 400;
 }
 </style>

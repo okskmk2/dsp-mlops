@@ -4,15 +4,16 @@ defineProps({
   value: { type: [String, Number], required: true },
   hint: { type: String, default: '' },
   alert: Boolean,
+  to: { type: [String, Object], default: '' },
 })
 </script>
 
 <template>
-  <article class="ds-kpi">
+  <component :is="to ? 'RouterLink' : 'article'" class="ds-kpi" :class="{ 'is-link': to }" :to="to || undefined">
     <p class="ds-meta">{{ label }}</p>
     <p class="ds-title-lg tabular" :class="{ 'is-alert': alert }">{{ value }}</p>
     <p v-if="hint" class="ds-meta">{{ hint }}</p>
-  </article>
+  </component>
 </template>
 
 <style scoped>
@@ -25,6 +26,15 @@ defineProps({
   gap: var(--ds-space-1);
   min-width: 0;
   padding: var(--ds-space-5);
+}
+
+.ds-kpi.is-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ds-kpi.is-link:hover {
+  border-color: var(--ds-text-secondary);
 }
 
 .is-alert {

@@ -5,7 +5,6 @@ import { nodeType } from '../../data/labels'
 const props = defineProps({
   nodes: { type: Array, default: () => [] },
   edges: { type: Array, default: () => [] },
-  projects: { type: Array, default: () => [] },
   selectedId: { type: String, default: '' },
   query: { type: String, default: '' },
   impactIds: { type: Array, default: () => [] },
@@ -15,7 +14,6 @@ const emit = defineEmits(['select'])
 
 const COLS = [
   { id: 'dataset', label: '데이터셋' },
-  { id: 'job', label: 'Job' },
   { id: 'modelVersion', label: '모델' },
   { id: 'endpoint', label: '엔드포인트' },
 ]
@@ -24,63 +22,39 @@ const NODE_W = 228
 const NODE_H = 72
 const COL_GAP = 88
 const ROW_GAP = 16
-const GROUP_GAP = 48
 const PAD_X = 24
 const PAD_Y = 64
 const PORT = 6
 
 const kindAccent = {
   dataset: 'var(--ds-text-tertiary)',
-  job: 'var(--ds-info)',
   modelVersion: 'var(--ds-primary)',
   endpoint: 'var(--ds-success)',
 }
 
 const layout = computed(() => {
-  const byProject = new Map(
-    props.projects.map((p) => [p.id, { dataset: [], job: [], modelVersion: [], endpoint: [] }]),
-  )
-  const orphan = { dataset: [], job: [], modelVersion: [], endpoint: [] }
-
+  const cols = { dataset: [], modelVersion: [], endpoint: [] }
   for (const n of props.nodes) {
-    const bucket = byProject.get(n.projectId) || orphan
-    if (bucket[n.kind]) bucket[n.kind].push(n)
+    if (cols[n.kind]) cols[n.kind].push(n)
   }
 
-  const groups = []
-  for (const p of props.projects) {
-    const cols = byProject.get(p.id)
-    if (!COLS.some((c) => cols[c.id].length)) continue
-    groups.push({ id: p.id, name: p.name, cols })
-  }
-  if (COLS.some((c) => orphan[c.id].length)) {
-    groups.push({ id: '_other', name: '기타', cols: orphan })
-  }
-
-  let y = PAD_Y
   const placed = []
-  const bands = []
-  for (const g of groups) {
-    const rows = Math.max(1, ...COLS.map((c) => g.cols[c.id].length))
-    const h = rows * NODE_H + (rows - 1) * ROW_GAP
-    bands.push({ id: g.id, name: g.name, y, h })
-    COLS.forEach((c, ci) => {
-      g.cols[c.id].forEach((n, i) => {
-        placed.push({
-          ...n,
-          title: n.label || n.name || n.id,
-          x: PAD_X + ci * (NODE_W + COL_GAP),
-          y: y + i * (NODE_H + ROW_GAP),
-        })
+  COLS.forEach((c, ci) => {
+    cols[c.id].forEach((n, i) => {
+      placed.push({
+        ...n,
+        title: n.label || n.name || n.id,
+        x: PAD_X + ci * (NODE_W + COL_GAP),
+        y: PAD_Y + i * (NODE_H + ROW_GAP),
       })
     })
-    y += h + GROUP_GAP
-  }
+  })
 
   const width = PAD_X * 2 + COLS.length * NODE_W + (COLS.length - 1) * COL_GAP
-  const height = Math.max(PAD_Y + NODE_H, y - GROUP_GAP + PAD_X)
+  const maxRows = Math.max(1, ...COLS.map((c) => cols[c.id].length))
+  const height = PAD_Y + maxRows * NODE_H + (maxRows - 1) * ROW_GAP + PAD_X
   const byId = Object.fromEntries(placed.map((n) => [n.id, n]))
-  return { placed, bands, width, height, byId }
+  return { placed, width, height, byId }
 })
 
 const paths = computed(() => {
@@ -120,17 +94,17 @@ function matches(n) {
 }
 
 function isImpactNode(id) {
-  return !props.selectedId || impactSet.value.has(id)
+  return !props.selectedId || !props.impactIds.length || impactSet.value.has(id)
 }
 
 function isImpactEdge(p) {
-  if (!props.selectedId) return false
+  if (!props.selectedId || !props.impactIds.length) return false
   return impactSet.value.has(p.from) && impactSet.value.has(p.to)
 }
 
 function nodeOpacity(n) {
   if (!matches(n)) return 0.28
-  if (props.selectedId && !isImpactNode(n.id)) return 0.28
+  if (!isImpactNode(n.id)) return 0.28
   return 1
 }
 
@@ -163,25 +137,6 @@ function onKey(event, n) {
           <rect :x="n.x" :y="n.y" :width="NODE_W" :height="NODE_H" rx="8" />
         </clipPath>
       </defs>
-
-      <g v-for="band in layout.bands" :key="band.id">
-        <rect
-          :x="0"
-          :y="band.y - 28"
-          :width="layout.width"
-          :height="band.h + 36"
-          fill="var(--ds-canvas-subtle)"
-        />
-        <text
-          :x="PAD_X"
-          :y="band.y - 10"
-          fill="var(--ds-text-tertiary)"
-          font-size="12"
-          font-weight="600"
-        >
-          {{ band.name }}
-        </text>
-      </g>
 
       <g v-for="(col, ci) in COLS" :key="col.id">
         <text
@@ -236,16 +191,17 @@ function onKey(event, n) {
           :fill="kindAccent[n.kind]"
           :clip-path="`url(#lg-clip-${n.id})`"
         />
-        <text :x="n.x + 16" :y="n.y + 24" fill="var(--ds-text-secondary)" font-size="12">
-          {{ nodeType[n.kind] }}
-        </text>
-        <text :x="n.x + 16" :y="n.y + 46" fill="var(--ds-text)" font-size="14" font-weight="600">
+        <text :x="n.x + 16" :y="n.y + 34" fill="var(--ds-text)" font-size="14" font-weight="600">
           {{ clip(n.title) }}
         </text>
-        <text v-if="n.ref || n.version" :x="n.x + 16" :y="n.y + 62" fill="var(--ds-text-tertiary)" font-size="12" font-family="var(--ds-font-mono)">
-          {{ clip(n.version ? `v${n.version}` : n.ref, 24) }}
+        <text v-if="n.kind === 'modelVersion' && n.projectName" :x="n.x + 16" :y="n.y + 54" fill="var(--ds-text-tertiary)" font-size="12">
+          {{ clip(n.projectName, 24) }}
+        </text>
+        <text v-else-if="n.ref" :x="n.x + 16" :y="n.y + 54" fill="var(--ds-text-tertiary)" font-size="12" font-family="var(--ds-font-mono)">
+          {{ clip(n.ref, 24) }}
         </text>
         <circle
+          v-if="n.kind !== 'dataset'"
           :cx="n.x"
           :cy="n.y + NODE_H / 2"
           :r="PORT"
@@ -254,6 +210,7 @@ function onKey(event, n) {
           stroke-width="1"
         />
         <circle
+          v-if="n.kind !== 'endpoint'"
           :cx="n.x + NODE_W"
           :cy="n.y + NODE_H / 2"
           :r="PORT"

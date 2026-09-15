@@ -2,70 +2,63 @@
 import {
   Activity,
   CircleHelp,
+  ClipboardList,
   FolderKanban,
   House,
-  Plus,
   Shield,
 } from '@lucide/vue'
-import { computed, ref, onMounted, onUnmounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import DsIcon from '../ui/DsIcon.vue'
 import { canManageDspSettings } from '../../lib/permissions'
 import { useAuthStore } from '../../stores/auth'
 
 const route = useRoute()
-const router = useRouter()
 const auth = useAuthStore()
 const isAdmin = computed(() => canManageDspSettings(auth.user))
-
-const showQuickMenu = ref(false)
-
-function toggleQuickMenu() {
-  showQuickMenu.value = !showQuickMenu.value
-}
-
-function handleQuickAction(path) {
-  showQuickMenu.value = false
-  router.push(path)
-}
-
-function onDocClick(event) {
-  if (!event.target.closest('.quick-action-wrap')) {
-    showQuickMenu.value = false
-  }
-}
-
-onMounted(() => document.addEventListener('click', onDocClick))
-onUnmounted(() => document.removeEventListener('click', onDocClick))
 
 const items = [
   { id: 'home', label: '홈', route: '/home', icon: House },
   {
-    id: 'assets',
-    label: 'ML 자산',
+    id: 'browse',
+    label: '프로젝트·모델',
     icon: FolderKanban,
     children: [
-      { id: 'projectList', label: '프로젝트 목록', route: '/projects' },
+      { id: 'projectList', label: '프로젝트', route: '/projects' },
       { id: 'registry', label: '모델 레지스트리', route: '/models' },
+      { id: 'modelStatus', label: '모델 현황', route: '/models/promotions' },
+    ],
+  },
+  {
+    id: 'requests',
+    label: '신청',
+    icon: ClipboardList,
+    children: [
+      { id: 'projectCreate', label: '프로젝트 생성', route: '/projects/new' },
+      { id: 'requestList', label: '분석 요청', route: '/requests' },
+      { id: 'requestForm', label: '분석 요청 작성', route: '/requests/new' },
+      { id: 'modelPromoteRequest', label: '모델 승격', route: '/models/promote-request' },
+      { id: 'resourceUpgradeRequest', label: '리소스 업그레이드', route: '/resources/upgrade-request' },
     ],
   },
   {
     id: 'ops',
-    label: '운영 관제',
+    label: '운영 현황',
     icon: Activity,
     children: [
-      { id: 'monitorStatus', label: '모니터 현황', route: '/monitoring' },
+      { id: 'monitorStatus', label: '모니터', route: '/monitoring' },
+      { id: 'resourceStatus', label: '리소스', route: '/ml-ops' },
+      { id: 'cost', label: '비용', route: '/cost' },
       { id: 'lineageExplore', label: '리니지', route: '/lineage' },
-      { id: 'costByProject', label: '비용', route: '/cost' },
     ],
   },
   {
-    id: 'support',
-    label: '지원센터',
+    id: 'help',
+    label: '안내',
     icon: CircleHelp,
     children: [
-      { id: 'requestList', label: '분석 요청', route: '/requests' },
-      { id: 'guides', label: '사용법·공지', route: '/support/guides' },
+      { id: 'notices', label: '공지사항', route: '/support/notices' },
+      { id: 'guides', label: '서비스 가이드', route: '/support/guides' },
     ],
   },
 ]
@@ -78,6 +71,8 @@ const adminItem = {
     { id: 'adminUsers', label: '사용자 관리', route: '/admin/users' },
     { id: 'adminPermissions', label: '권한 관리', route: '/admin/permissions' },
     { id: 'adminCodes', label: '코드 관리', route: '/admin/codes' },
+    { id: 'adminBatch', label: '배치관리', route: '/admin/batch' },
+    { id: 'adminUsage', label: '사용자 사용 통계', route: '/admin/usage' },
   ],
 }
 
@@ -85,33 +80,22 @@ function isActive(path) {
   if (path === '/home') return route.path === '/home'
   if (path === '/projects') return route.path === '/projects'
   if (path === '/models') return route.path === '/models'
+  if (path === '/models/promotions') return route.path === '/models/promotions'
+  if (path === '/models/promote-request') return route.path === '/models/promote-request'
+  if (path === '/ml-ops') return route.path.startsWith('/ml-ops')
+  if (path === '/resources/upgrade-request') return route.path === '/resources/upgrade-request'
   if (path === '/monitoring') return route.path.startsWith('/monitoring')
   if (path === '/cost') return route.path.startsWith('/cost')
   if (path === '/lineage') return route.path.startsWith('/lineage')
   if (path === '/requests') return route.path === '/requests' || (route.path.startsWith('/requests/') && route.path !== '/requests/new')
-  if (path === '/support/guides') return route.path.startsWith('/support')
+  if (path === '/support/notices') return route.path.startsWith('/support/notices')
+  if (path === '/support/guides') return route.path.startsWith('/support/guides')
   return route.path === path || route.path.startsWith(`${path}/`)
 }
 </script>
 
 <template>
   <nav class="snb" aria-label="주 메뉴">
-    <!-- Quick Action Button -->
-    <div class="quick-action-wrap">
-      <button class="quick-btn" type="button" @click="toggleQuickMenu">
-        <DsIcon :is="Plus" :size="16" />
-        <span>신규 요청</span>
-      </button>
-      <div v-if="showQuickMenu" class="quick-menu" role="menu">
-        <button type="button" class="quick-item" @click="handleQuickAction('/projects/new')">
-          <span>프로젝트 생성 신청</span>
-        </button>
-        <button type="button" class="quick-item" @click="handleQuickAction('/requests/new')">
-          <span>분석 요청하기</span>
-        </button>
-      </div>
-    </div>
-
     <div class="snb-main">
       <div v-for="item in items" :key="item.id" class="group">
         <RouterLink
@@ -168,66 +152,6 @@ function isActive(path) {
   padding: var(--ds-space-3) var(--ds-space-3);
   position: sticky;
   top: var(--ds-gnb-h);
-}
-
-.quick-action-wrap {
-  margin-bottom: var(--ds-space-3);
-  position: relative;
-}
-
-.quick-btn {
-  align-items: center;
-  background: var(--ds-primary);
-  border: none;
-  border-radius: var(--ds-radius-md);
-  color: #ffffff;
-  cursor: pointer;
-  display: flex;
-  font-size: var(--ds-font-label);
-  font-weight: 600;
-  gap: var(--ds-space-2);
-  justify-content: center;
-  min-height: 38px;
-  transition: opacity 0.15s ease;
-  width: 100%;
-}
-
-.quick-btn:hover {
-  opacity: 0.9;
-}
-
-.quick-menu {
-  background: var(--ds-surface);
-  border: 1px solid var(--ds-border);
-  border-radius: var(--ds-radius-md);
-  box-shadow: var(--ds-shadow-lg);
-  display: flex;
-  flex-direction: column;
-  left: 0;
-  padding: var(--ds-space-1);
-  position: absolute;
-  top: calc(100% + 4px);
-  width: 100%;
-  z-index: 100;
-}
-
-.quick-item {
-  align-items: center;
-  background: transparent;
-  border: none;
-  border-radius: var(--ds-radius-sm);
-  color: var(--ds-text);
-  cursor: pointer;
-  display: flex;
-  font-size: var(--ds-font-label);
-  padding: var(--ds-space-2) var(--ds-space-3);
-  text-align: left;
-  width: 100%;
-}
-
-.quick-item:hover {
-  background: var(--ds-canvas-subtle);
-  color: var(--ds-primary);
 }
 
 .snb-main {

@@ -16,8 +16,10 @@
           "query": {
             "status": "draft | pending_approval | active | closed | empty",
             "platform": "azure_ml | azure_databricks | empty",
-            "scope": "all | mine"
+            "scope": "all | mine",
+            "sort": "endAt:asc(기본) | name:asc | status:asc | budgetUsedPct:desc | championCount:desc"
           },
+          "notes": "status=draft는 요청자 본인의 draft만 반환(타인 draft 비노출). MVP는 클라이언트 필터/정렬이며 이 query 스펙은 서버 페이징 도입 시 계약.",
           "response": { "items": ["ProjectListItem"] }
         }
       ]

@@ -7,11 +7,12 @@ const props = defineProps({
 
 const route = useRoute()
 const items = [
-  { id: 'overview', label: '개요', suffix: '' },
-  { id: 'team', label: '팀·권한', suffix: '/team' },
+  { id: 'overview', label: '대시보드', suffix: '' },
+  { id: 'info', label: '기본정보', suffix: '/info' },
+  { id: 'team', label: '구성원', suffix: '/team' },
   { id: 'resources', label: '리소스', suffix: '/resources' },
-  { id: 'projectCost', label: '비용', suffix: '/cost' },
-  { id: 'projectModels', label: '모델', suffix: '/models' },
+  { id: 'projectModels', label: '모델현황', suffix: '/models' },
+  { id: 'monitoring', label: '모니터링', suffix: '/monitoring' },
 ]
 
 function to(item) {

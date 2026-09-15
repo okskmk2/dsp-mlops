@@ -45,6 +45,12 @@ const sourceRequest = computed(() => (form.sourceRequestId ? dsp.analysisRequest
 
 const errors = reactive({})
 
+const roleOptions = [
+  { value: 'coordinator', label: roleLabel.coordinator },
+  { value: 'member', label: roleLabel.member },
+  { value: 'viewer', label: roleLabel.viewer },
+]
+
 watch(
   [draftId, fromRequestId],
   ([id, requestId]) => {
@@ -109,7 +115,10 @@ function validate() {
   if (!form.endAt) e.endAt = '종료일을 입력하세요.'
   if (form.startAt && form.endAt && form.endAt < form.startAt) e.endAt = '종료일은 시작일 이후여야 합니다.'
   if (!form.useAzureMl && !form.useAzureDatabricks) e.platforms = '플랫폼을 하나 이상 선택하세요.'
-  Object.assign(errors, { name: '', goal: '', background: '', budgetAmount: '', startAt: '', endAt: '', platforms: '' }, e)
+  const selectedUsers = form.members.map((member) => member.userId).filter(Boolean)
+  if (selectedUsers.length !== new Set(selectedUsers).size) e.members = '같은 사용자를 여러 번 초대할 수 없습니다.'
+  if (form.members.some((member) => !member.userId)) e.members = '초대할 사용자를 모두 선택하세요.'
+  Object.assign(errors, { name: '', goal: '', background: '', budgetAmount: '', startAt: '', endAt: '', platforms: '', members: '' }, e)
   return !Object.keys(e).length
 }
 
@@ -133,6 +142,11 @@ function addMember() {
 
 function removeMember(i) {
   form.members.splice(i, 1)
+}
+
+function memberUserOptions(index) {
+  const selectedByOtherRow = new Set(form.members.filter((_, i) => i !== index).map((member) => member.userId))
+  return userOptions.value.filter((option) => !selectedByOtherRow.has(option.value))
 }
 </script>
 
@@ -183,22 +197,19 @@ function removeMember(i) {
             <DsInput v-model="form.endAt" type="date" width="sm" />
           </DsField>
         </div>
-        <DsField label="초기 멤버" hint="신청자는 오너로 지정됩니다. 오너·코디네이터 지정은 오너만 이후에도 가능합니다.">
+        <DsField label="프로젝트 멤버 초대" hint="신청자는 오너로 지정됩니다. 초대할 멤버의 프로젝트 권한을 지정하세요.">
           <div class="members">
             <div v-for="(m, i) in form.members" :key="i" class="member-row">
-              <DsSelect v-model="m.userId" :options="userOptions" width="lg" placeholder="사용자" />
+              <DsSelect v-model="m.userId" :options="memberUserOptions(i)" width="lg" placeholder="초대할 사용자" />
               <DsSelect
                 v-model="m.projectRole"
-                :options="[
-                  { value: 'coordinator', label: roleLabel.coordinator },
-                  { value: 'member', label: roleLabel.member },
-                  { value: 'viewer', label: roleLabel.viewer },
-                ]"
+                :options="roleOptions"
                 width="sm"
                 placeholder=""
               />
               <DsButton variant="ghost" @click="removeMember(i)">제거</DsButton>
             </div>
+            <p v-if="errors.members" class="err">{{ errors.members }}</p>
             <DsButton variant="secondary" @click="addMember">멤버 추가</DsButton>
           </div>
         </DsField>

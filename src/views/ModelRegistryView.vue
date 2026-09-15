@@ -1,7 +1,7 @@
 <script setup>
 import { FilePen, Swords, Trophy } from '@lucide/vue'
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import DsButton from '../components/ui/DsButton.vue'
 import DsCard from '../components/ui/DsCard.vue'
 import DsChip from '../components/ui/DsChip.vue'
@@ -15,8 +15,9 @@ import { useDspStore } from '../stores/dsp'
 
 const dsp = useDspStore()
 const router = useRouter()
+const route = useRoute()
 const view = ref('kanban')
-const stage = ref('')
+const stage = ref(route.query.stage || '')
 
 const models = computed(() => {
   let list = dsp.visibleModels()

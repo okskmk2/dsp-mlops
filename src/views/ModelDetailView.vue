@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import DsLineChart from '../components/charts/DsLineChart.vue'
+import ModelSubnav from '../components/layout/ModelSubnav.vue'
 import DsButton from '../components/ui/DsButton.vue'
 import DsCard from '../components/ui/DsCard.vue'
 import DsChip from '../components/ui/DsChip.vue'
@@ -51,6 +52,11 @@ const lineageNodes = computed(() => {
   const edges = dsp.lineageEdges.filter((e) => e.to === model.value.id || e.from === model.value.id)
   return edges
 })
+function lineageLink(id) {
+  if (dsp.datasets.find((item) => item.id === id)) return `/datasets/${id}`
+  if (dsp.modelById(id)) return `/models/${id}`
+  return `/lineage/nodes/${id}`
+}
 </script>
 
 <template>
@@ -71,6 +77,7 @@ const lineageNodes = computed(() => {
         <DsButton v-if="canDemo" variant="danger" @click="dsp.submitDemotion(model.id)">강등 상신</DsButton>
       </template>
     </DsPageHeader>
+    <ModelSubnav :model-id="model.id" />
 
     <div class="chips">
       <DsChip :tone="modelStageChip[model.stage]">{{ modelStage[model.stage] }}</DsChip>
@@ -115,14 +122,11 @@ const lineageNodes = computed(() => {
 
     <DsCard class="ds-follow">
       <template #title>미니 리니지</template>
-      <template #action>
-        <DsButton variant="ghost" to="/lineage">리니지 확대</DsButton>
-      </template>
       <ul class="mini">
         <li v-for="e in lineageNodes" :key="`${e.from}-${e.to}`">
-          <span class="mono">{{ e.from }}</span>
+          <RouterLink class="mono" :to="lineageLink(e.from)">{{ e.from }}</RouterLink>
           →
-          <span class="mono">{{ e.to }}</span>
+          <RouterLink class="mono" :to="lineageLink(e.to)">{{ e.to }}</RouterLink>
         </li>
       </ul>
       <p v-if="model.endpointId" class="ds-meta">엔드포인트 {{ model.endpointId }}</p>

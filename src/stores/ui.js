@@ -8,7 +8,6 @@ export const useUiStore = defineStore('ui', () => {
   const drawer = ref(null)
   const retrainModelId = ref(null)
   const searchOpen = ref(false)
-  const monitorOpen = ref(false)
   const avatarOpen = ref(false)
 
   function toast(message, tone = 'info') {
@@ -39,7 +38,6 @@ export const useUiStore = defineStore('ui', () => {
 
   function closeOverlays() {
     searchOpen.value = false
-    monitorOpen.value = false
     avatarOpen.value = false
   }
 
@@ -49,7 +47,6 @@ export const useUiStore = defineStore('ui', () => {
     drawer,
     retrainModelId,
     searchOpen,
-    monitorOpen,
     avatarOpen,
     toast,
     dismissToast,

@@ -4,7 +4,7 @@
       "id": "lineageExplore",
       "route": "/lineage",
       "view": "src/views/LineageView.vue",
-      "purpose": "데이터셋-Job-모델-엔드포인트 계보. 노드 선택은 상세 페이지.",
+      "purpose": "데이터셋-모델-엔드포인트 계보. Job 노드는 그래프에서 숨기고 데이터셋→모델 에지로 직접 연결한다(통과 연결). 노드 선택은 상세 페이지.",
       "auth": true,
       "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
       "endpoints": [
@@ -13,6 +13,7 @@
           "method": "GET",
           "path": "/api/v1/lineage",
           "query": { "q": "string" },
+          "why": "서버가 job을 포함한 원본 그래프를 반환하면 클라이언트가 collapseLineage로 job 노드를 제거하고 데이터셋→모델 에지를 재구성한다.",
           "response": {
             "nodes": [
               {
@@ -45,6 +46,28 @@
             "node": "object",
             "upstream": ["object"],
             "downstream": ["object"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "datasetDetail",
+      "route": "/datasets/:id",
+      "view": "src/views/DatasetDetailView.vue",
+      "purpose": "데이터셋 속성, 컬럼 정보(스키마), 이를 직접 소비하는 Job/모델 목록. 전체 계보 탐색은 lineageNode로 이동.",
+      "auth": true,
+      "usesCommon": ["session.me", "shell.badges", "shell.monitorSummary"],
+      "endpoints": [
+        {
+          "id": "get",
+          "method": "GET",
+          "path": "/api/v1/datasets/:id",
+          "why": "속성 + 컴럼 스키마 + 직접 다운스트림 소비자(Job/모델)",
+          "response": {
+            "dataset": "Dataset",
+            "projectName": "string",
+            "columns": [{ "name": "string", "dataType": "string", "nullable": "boolean", "description": "string" }],
+            "consumers": [{ "id": "string", "kind": "job | modelVersion", "name": "string", "stage": "string | null" }]
           }
         }
       ]

@@ -9,15 +9,21 @@ import ComputeUpgradeView from '../views/ComputeUpgradeView.vue'
 import ContaminationView from '../views/ContaminationView.vue'
 import CostResourcesView from '../views/CostResourcesView.vue'
 import CostView from '../views/CostView.vue'
+import DatasetDetailView from '../views/DatasetDetailView.vue'
 import DriftView from '../views/DriftView.vue'
 import HomeView from '../views/HomeView.vue'
 import LineageNodeView from '../views/LineageNodeView.vue'
 import LineageView from '../views/LineageView.vue'
 import LoginView from '../views/LoginView.vue'
 import ModelDetailView from '../views/ModelDetailView.vue'
+import ModelLineageView from '../views/ModelLineageView.vue'
+import ModelHistoryView from '../views/ModelHistoryView.vue'
 import ModelPromoteView from '../views/ModelPromoteView.vue'
 import ModelPromotionsView from '../views/ModelPromotionsView.vue'
 import ModelRegistryView from '../views/ModelRegistryView.vue'
+import ModelPromoteRequestView from '../views/ModelPromoteRequestView.vue'
+import ModelStakeholdersView from '../views/ModelStakeholdersView.vue'
+import MLOpsView from '../views/MLOpsView.vue'
 import MonitorStatusView from '../views/MonitorStatusView.vue'
 import NotificationsView from '../views/NotificationsView.vue'
 import ProjectCostView from '../views/ProjectCostView.vue'
@@ -25,15 +31,21 @@ import ProjectCreateView from '../views/ProjectCreateView.vue'
 import ProjectListView from '../views/ProjectListView.vue'
 import ProjectModelsView from '../views/ProjectModelsView.vue'
 import ProjectOverviewView from '../views/ProjectOverviewView.vue'
+import ProjectInfoView from '../views/ProjectInfoView.vue'
 import ProjectResourcesView from '../views/ProjectResourcesView.vue'
 import ProjectTeamView from '../views/ProjectTeamView.vue'
+import ResourceUpgradeRequestView from '../views/ResourceUpgradeRequestView.vue'
+import ProjectMonitoringView from '../views/ProjectMonitoringView.vue'
 import SearchView from '../views/SearchView.vue'
 import SettingsView from '../views/SettingsView.vue'
 import ThresholdsView from '../views/ThresholdsView.vue'
 import AdminCodeGroupsView from '../views/admin/AdminCodeGroupsView.vue'
 import AdminCodesView from '../views/admin/AdminCodesView.vue'
 import AdminPermissionsView from '../views/admin/AdminPermissionsView.vue'
+import AdminPermissionEditView from '../views/admin/AdminPermissionEditView.vue'
 import AdminUsersView from '../views/admin/AdminUsersView.vue'
+import AdminBatchJobsView from '../views/admin/AdminBatchJobsView.vue'
+import AdminUsageStatsView from '../views/admin/AdminUsageStatsView.vue'
 import AnalysisRequestDetailView from '../views/AnalysisRequestDetailView.vue'
 import AnalysisRequestFormView from '../views/AnalysisRequestFormView.vue'
 import AnalysisRequestListView from '../views/AnalysisRequestListView.vue'
@@ -58,16 +70,25 @@ const router = createRouter({
         { path: 'projects', component: ProjectListView },
         { path: 'projects/new', component: ProjectCreateView },
         { path: 'projects/:id', component: ProjectOverviewView },
+        { path: 'projects/:id/info', component: ProjectInfoView },
         { path: 'projects/:id/team', component: ProjectTeamView },
         { path: 'projects/:id/resources/:provisionId/upgrade', component: ComputeUpgradeView },
         { path: 'projects/:id/resources', component: ProjectResourcesView },
-        { path: 'projects/:id/cost', component: ProjectCostView },
+        { path: 'projects/:id/cost', redirect: (to) => `/projects/${to.params.id}/resources` },
+        { path: 'resources/upgrade-request', component: ResourceUpgradeRequestView },
         { path: 'projects/:id/models', component: ProjectModelsView },
+        { path: 'projects/:id/monitoring', component: ProjectMonitoringView },
         { path: 'models', component: ModelRegistryView },
         { path: 'models/promotions', component: ModelPromotionsView },
+        { path: 'models/promote-request', component: ModelPromoteRequestView },
         { path: 'models/:id', component: ModelDetailView },
+        { path: 'models/:id/lineage', component: ModelLineageView },
+        { path: 'models/:id/stakeholders', component: ModelStakeholdersView },
+        { path: 'models/:id/history', component: ModelHistoryView },
         { path: 'models/:id/promote', component: ModelPromoteView },
+        { path: 'datasets/:id', component: DatasetDetailView },
         { path: 'monitoring', component: MonitorStatusView },
+        { path: 'ml-ops', component: MLOpsView },
         { path: 'monitoring/thresholds', component: ThresholdsView },
         { path: 'monitoring/drift', component: DriftView },
         { path: 'cost', component: CostView },
@@ -93,8 +114,12 @@ const router = createRouter({
         { path: 'settings', component: SettingsView },
         { path: 'admin/users', component: AdminUsersView, meta: { admin: true } },
         { path: 'admin/permissions', component: AdminPermissionsView, meta: { admin: true } },
+        { path: 'admin/permissions/new', component: AdminPermissionEditView, meta: { admin: true } },
+        { path: 'admin/permissions/:id', component: AdminPermissionEditView, meta: { admin: true } },
         { path: 'admin/codes', component: AdminCodeGroupsView, meta: { admin: true } },
         { path: 'admin/codes/:group', component: AdminCodesView, meta: { admin: true } },
+        { path: 'admin/batch', component: AdminBatchJobsView, meta: { admin: true } },
+        { path: 'admin/usage', component: AdminUsageStatsView, meta: { admin: true } },
       ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/home' },
@@ -116,6 +141,10 @@ router.beforeEach((to) => {
   if (to.params.id && String(to.path).startsWith('/models/')) {
     const model = dsp.modelById(to.params.id)
     if (!model || !dsp.canSeeProject(model.projectId)) return '/models'
+  }
+  if (to.params.id && String(to.path).startsWith('/datasets/')) {
+    const dataset = dsp.datasetById(to.params.id)
+    if (!dataset) return '/lineage'
   }
   return true
 })

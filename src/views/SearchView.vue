@@ -21,6 +21,7 @@ watch(q, () => {
 function open(kind, row) {
   if (kind === 'project') router.push(row.status === 'draft' ? { path: '/projects/new', query: { draft: row.id } } : `/projects/${row.id}`)
   if (kind === 'model') router.push(`/models/${row.id}`)
+  if (kind === 'dataset') router.push(`/datasets/${row.id}`)
   if (kind === 'approval') router.push(`/approvals/${row.id}`)
   if (kind === 'guide') router.push(`/support/guides/${row.id}`)
   if (kind === 'notice') router.push(`/support/notices/${row.id}`)
@@ -61,10 +62,10 @@ function open(kind, row) {
     </template>
     <template v-else-if="tab === 'dataset'">
       <li v-for="d in result.dataset" :key="d.id">
-        <div>
+        <button type="button" @click="open('dataset', d)">
           <span class="ds-body-strong">{{ d.name }}</span>
           <span class="ds-meta mono">{{ d.ref }}</span>
-        </div>
+        </button>
       </li>
     </template>
     <template v-else-if="tab === 'approval'">

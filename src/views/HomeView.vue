@@ -79,10 +79,10 @@ const approvalCols = [
   </div>
 
   <section class="kpis">
-    <DsKpi label="Champion" :value="kpis.championCount" />
-    <DsKpi label="모니터 실패" :value="kpis.monitorFailCount" :alert="kpis.monitorFailCount > 0" />
-    <DsKpi label="드리프트 경보" :value="kpis.driftCount" :alert="kpis.driftCount > 0" />
-    <DsKpi label="예산 초과 프로젝트" :value="kpis.overBudgetProjectCount" :alert="kpis.overBudgetProjectCount > 0" />
+    <DsKpi label="Champion" :value="kpis.championCount" to="/models?stage=champion" />
+    <DsKpi label="모니터 실패" :value="kpis.monitorFailCount" :alert="kpis.monitorFailCount > 0" to="/monitoring?result=fail" />
+    <DsKpi label="드리프트 경보" :value="kpis.driftCount" :alert="kpis.driftCount > 0" to="/monitoring" />
+    <DsKpi label="예산 초과 프로젝트" :value="kpis.overBudgetProjectCount" :alert="kpis.overBudgetProjectCount > 0" to="/cost" />
   </section>
 
   <section class="grid">

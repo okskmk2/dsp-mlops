@@ -8,6 +8,7 @@ import DsCard from '../components/ui/DsCard.vue'
 import DsChip from '../components/ui/DsChip.vue'
 import DsEmpty from '../components/ui/DsEmpty.vue'
 import DsPageHeader from '../components/ui/DsPageHeader.vue'
+import DsTable from '../components/ui/DsTable.vue'
 import { platformType, provisionKind, provisionStatus, provisionStatusChip } from '../data/labels'
 import {
   computeClassById,
@@ -27,6 +28,9 @@ const dsp = useDspStore()
 const project = computed(() => dsp.projectById(route.params.id))
 const items = computed(() => dsp.provisions.filter((p) => p.projectId === route.params.id))
 const workspaces = computed(() => items.value.filter((p) => isWorkspaceProvision(p)))
+const costs = computed(() => dsp.costRecords.filter((record) => record.projectId === route.params.id))
+const costTotal = computed(() => costs.value.reduce((sum, record) => sum + record.amount, 0))
+const costColumns = [{ key: 'period', label: '기간' }, { key: 'platform', label: '플랫폼' }, { key: 'resourceId', label: '리소스' }, { key: 'amount', label: '금액', numeric: true }]
 
 const canRequest = computed(
   () =>
@@ -148,6 +152,14 @@ function cloudUrl(item) {
       </DsCard>
     </div>
     <DsEmpty v-else title="프로비저닝 건이 없습니다" description="생성 결재가 승인되면 플랫폼별로 부가 작업이 붙습니다." />
+    <DsCard class="cost-section">
+      <template #title>비용</template>
+      <template #action><strong>{{ formatWon(costTotal) }}</strong></template>
+      <DsTable :columns="costColumns" :rows="costs.map((record, index) => ({ ...record, id: index }))">
+        <template #platform="{ row }">{{ platformType[row.platform] }}</template>
+        <template #amount="{ row }">{{ formatWon(row.amount) }}</template>
+      </DsTable>
+    </DsCard>
   </div>
 </template>
 
@@ -195,4 +207,6 @@ function cloudUrl(item) {
 .tabular {
   font-variant-numeric: tabular-nums;
 }
+
+.cost-section { margin-top: var(--ds-section-gap); }
 </style>

@@ -1,5 +1,5 @@
 <script setup>
-import { Bell, ClipboardCheck, Activity, Search } from '@lucide/vue'
+import { Bell, Search } from '@lucide/vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import DsAvatar from '../ui/DsAvatar.vue'
@@ -8,7 +8,6 @@ import { useAuthStore } from '../../stores/auth'
 import { useDspStore } from '../../stores/dsp'
 import { useUiStore } from '../../stores/ui'
 import AvatarMenu from './AvatarMenu.vue'
-import MonitorPopover from './MonitorPopover.vue'
 
 const auth = useAuthStore()
 const dsp = useDspStore()
@@ -17,7 +16,6 @@ const router = useRouter()
 const route = useRoute()
 const q = ref(typeof route.query.q === 'string' ? route.query.q : '')
 
-const pendingApprovals = computed(() => dsp.approvals.filter((a) => a.status === 'pending' && a.approverId === auth.user?.id).length)
 const unread = computed(() => dsp.unreadNotifications().length)
 
 function submitSearch() {
@@ -29,7 +27,6 @@ function submitSearch() {
 
 function onDocClick(event) {
   if (!event.target.closest('.pop-wrap')) {
-    ui.monitorOpen = false
     ui.avatarOpen = false
   }
 }
@@ -54,25 +51,13 @@ onUnmounted(() => document.removeEventListener('click', onDocClick))
       />
     </form>
     <nav class="right" aria-label="글로벌 도구">
-      <RouterLink class="gnb-item" to="/approvals">
-        <DsIcon :is="ClipboardCheck" :size="20" />
-        <span>결재함</span>
-        <em v-if="pendingApprovals" class="badge tabular">{{ pendingApprovals }}</em>
-      </RouterLink>
       <RouterLink class="gnb-item" to="/notifications">
         <DsIcon :is="Bell" :size="20" />
         <span>알림</span>
         <em v-if="unread" class="badge tabular">{{ unread }}</em>
       </RouterLink>
       <div class="pop-wrap">
-        <button class="gnb-item" type="button" :aria-expanded="ui.monitorOpen" @click="ui.monitorOpen = !ui.monitorOpen; ui.avatarOpen = false">
-          <DsIcon :is="Activity" :size="20" />
-          <span>모니터링</span>
-        </button>
-        <MonitorPopover v-if="ui.monitorOpen" />
-      </div>
-      <div class="pop-wrap">
-        <button class="gnb-item" type="button" :aria-expanded="ui.avatarOpen" :aria-label="auth.user?.name" @click="ui.avatarOpen = !ui.avatarOpen; ui.monitorOpen = false">
+        <button class="gnb-item" type="button" :aria-expanded="ui.avatarOpen" :aria-label="auth.user?.name" @click="ui.avatarOpen = !ui.avatarOpen">
           <DsAvatar :name="auth.user?.name || ''" :size="28" />
           <span>{{ auth.user?.name }}</span>
         </button>
